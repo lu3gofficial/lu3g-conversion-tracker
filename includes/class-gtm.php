@@ -320,11 +320,14 @@ final class LU3G_CT_GTM {
 				$tag(
 					'LU3G - Meta - Pixel base',
 					'html',
-					$html( "<script>\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\nfbq('init', '" . $g['meta_pixel_id'] . "');\nfbq('track', 'PageView');\n</script>" ),
-					// Tutte le pagine + eventi del banner: se il consenso arriva dopo il caricamento, il pixel parte allora (una volta).
+					// Una volta per evento, con un controllo nella pagina che lo esegue una sola volta: con "una volta per
+					// pagina" GTM considerava il tag già usato quando al caricamento era bloccato dal consenso, e non lo
+					// riprovava più all'evento del banner (visto su un sito reale con il modello Iubenda).
+					$html( "<script>\nif (!window.__lu3gMetaPixel) {\n  window.__lu3gMetaPixel = true;\n  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\n  fbq('init', '" . $g['meta_pixel_id'] . "');\n  fbq('track', 'PageView');\n}\n</script>" ),
+					// Tutte le pagine + eventi del banner: se il consenso arriva dopo il caricamento, il pixel parte allora.
 					array( self::ALL_PAGES, $t_consent ),
 					'',
-					array_merge( $needs_ads_consent, array( 'tagFiringOption' => 'ONCE_PER_LOAD' ) )
+					$needs_ads_consent
 				);
 				$setup = array( 'setupTag' => array( array( 'tagName' => 'LU3G - Meta - Pixel base', 'stopOnSetupFailure' => false ) ) );
 			}

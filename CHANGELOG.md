@@ -1,5 +1,13 @@
 # Registro delle modifiche
 
+## 1.2.1
+- **File per GTM, pixel Meta**: il tag "LU3G - Meta - Pixel base" era impostato "una volta per pagina". Al caricamento
+  il consenso non è ancora confermato (il modello Iubenda lo aggiorna poco dopo), GTM bloccava il tag e lo considerava
+  già usato, quindi non lo riprovava all'evento del banner: il pixel non partiva mai e nemmeno Lead / Contact arrivavano
+  a Meta. Ora il tag è "una volta per evento", con un controllo nella pagina che lo esegue una sola volta.
+  Trovato verificando la Consent Mode su un sito reale. **Dopo l'aggiornamento riscarica il file e reimportalo in GTM**
+  (opzione "Sovrascrivi" per i tag LU3G).
+
 ## 1.2.0
 - **Canali personalizzati** (scheda Canali, prima "Contatti"): oltre a WhatsApp, telefono ed email, regole tue con nome,
   "riconosci dal" (indirizzo del link: domini, domini con percorso o schemi; tipo di file; classe CSS di un pulsante,
