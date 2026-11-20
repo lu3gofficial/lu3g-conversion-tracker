@@ -1,0 +1,1168 @@
+{
+    "exportFormatVersion": 2,
+    "exportTime": "2026-11-20 00:00:00",
+    "containerVersion": {
+        "path": "accounts/6000000000/containers/100000000/versions/0",
+        "accountId": "6000000000",
+        "containerId": "100000000",
+        "containerVersionId": "0",
+        "container": {
+            "path": "accounts/6000000000/containers/100000000",
+            "accountId": "6000000000",
+            "containerId": "100000000",
+            "name": "LU3G Conversion Tracker",
+            "publicId": "GTM-XXXXXXX",
+            "usageContext": [
+                "WEB"
+            ]
+        },
+        "tag": [
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "1",
+                "name": "LU3G - GA4 - eventi form",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "{{Event}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "{{LU3G - GA4 Measurement ID}}"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "event_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - event_id}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "form_name"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - form_name}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "form_key"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - form_key}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "value"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - value}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "currency"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - currency}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "conversion_key"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - conversion_key}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "page_location"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - page_location pulita}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "lu3g_schema"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - schema_version}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "firingTriggerId": [
+                    "1"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                },
+                "monitoringMetadata": {
+                    "type": "MAP",
+                    "map": [
+                        {
+                            "type": "TEMPLATE",
+                            "key": "lu3g_role",
+                            "value": "ga4"
+                        }
+                    ]
+                },
+                "monitoringMetadataTagNameKey": "name"
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "2",
+                "name": "LU3G - GA4 - contact_click",
+                "type": "gaawe",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "eventName",
+                        "value": "{{Event}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "measurementIdOverride",
+                        "value": "{{LU3G - GA4 Measurement ID}}"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "eventSettingsTable",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "event_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - event_id}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "contact_type"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - contact_type}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "contact_id"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - contact_id}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "placement"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - placement}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameter",
+                                        "value": "page_location"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "parameterValue",
+                                        "value": "{{LU3G - page_location pulita}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "firingTriggerId": [
+                    "2"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                },
+                "monitoringMetadata": {
+                    "type": "MAP",
+                    "map": [
+                        {
+                            "type": "TEMPLATE",
+                            "key": "lu3g_role",
+                            "value": "ga4"
+                        }
+                    ]
+                },
+                "monitoringMetadataTagNameKey": "name"
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "3",
+                "name": "LU3G - Google Ads - conversioni",
+                "type": "awct",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionId",
+                        "value": "{{LU3G - Ads Conversion ID}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionLabel",
+                        "value": "{{LU3G - Ads Conversion Label}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionValue",
+                        "value": "{{LU3G - value}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "currencyCode",
+                        "value": "{{LU3G - currency}}"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "orderId",
+                        "value": "{{LU3G - event_id}}"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableEnhancedConversion",
+                        "value": "true"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "cssProvidedEnhancedConversionValue",
+                        "value": "{{LU3G - Dati forniti dall'utente}}"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableConversionLinker",
+                        "value": "true"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "conversionCookiePrefix",
+                        "value": "_gcl"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableProductReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableShippingData",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableNewCustomerReporting",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "rdp",
+                        "value": "false"
+                    }
+                ],
+                "firingTriggerId": [
+                    "3"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                },
+                "monitoringMetadata": {
+                    "type": "MAP",
+                    "map": [
+                        {
+                            "type": "TEMPLATE",
+                            "key": "lu3g_role",
+                            "value": "ads"
+                        }
+                    ]
+                },
+                "monitoringMetadataTagNameKey": "name"
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "4",
+                "name": "LU3G - Linker conversioni",
+                "type": "gclidw",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableCrossDomain",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableUrlPassthrough",
+                        "value": "false"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "enableCookieOverrides",
+                        "value": "false"
+                    }
+                ],
+                "firingTriggerId": [
+                    "2147479553"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "5",
+                "name": "LU3G - Bridge diagnostico",
+                "type": "cvt_100000000_1",
+                "parameter": [],
+                "firingTriggerId": [
+                    "4"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
+            }
+        ],
+        "trigger": [
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "triggerId": "1",
+                "name": "LU3G - eventi form (produzione)",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(lead_submit)$"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{LU3G - test_mode}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "false"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "triggerId": "2",
+                "name": "LU3G - contact_click (produzione)",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(contact_click)$"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{LU3G - test_mode}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "false"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "triggerId": "3",
+                "name": "LU3G - conversioni Google Ads (produzione)",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(lead_submit|contact_click)$"
+                            }
+                        ]
+                    }
+                ],
+                "filter": [
+                    {
+                        "type": "EQUALS",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{LU3G - test_mode}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "false"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{LU3G - conversion_key}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(lead|contact_whatsapp|contact_phone|contact_email)$"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "triggerId": "4",
+                "name": "LU3G - tutti gli eventi (bridge diagnostico)",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^(lead_submit|contact_click)$"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "variable": [
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "1",
+                "name": "LU3G - schema_version",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.schema_version"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "2",
+                "name": "LU3G - event_id",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.event_id"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "3",
+                "name": "LU3G - source",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.source"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "4",
+                "name": "LU3G - form_key",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.form_key"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "5",
+                "name": "LU3G - form_instance_id",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.form_instance_id"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "6",
+                "name": "LU3G - form_name",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.form_name"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "7",
+                "name": "LU3G - page_id",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.page_id"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "8",
+                "name": "LU3G - page_path",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.page_path"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "9",
+                "name": "LU3G - value",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.value"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "10",
+                "name": "LU3G - currency",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.currency"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "11",
+                "name": "LU3G - conversion_key",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.conversion_key"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "12",
+                "name": "LU3G - test_mode",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.test_mode"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "13",
+                "name": "LU3G - contact_type",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.contact_type"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "14",
+                "name": "LU3G - contact_id",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.contact_id"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "15",
+                "name": "LU3G - placement",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g.placement"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "16",
+                "name": "LU3G - lu3g_user_data",
+                "type": "v",
+                "parameter": [
+                    {
+                        "type": "INTEGER",
+                        "key": "dataLayerVersion",
+                        "value": "2"
+                    },
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "name",
+                        "value": "lu3g_user_data"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "17",
+                "name": "LU3G - user_data (hash)",
+                "type": "jsm",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "javascript",
+                        "value": "function () {\n  // Solo chiavi sha256_* già calcolate dal plugin (64 caratteri esadecimali); altrimenti undefined.\n  var u = {{LU3G - lu3g_user_data}};\n  if (!u || typeof u !== 'object') { return undefined; }\n  var o = {};\n  if (/^[0-9a-f]{64}$/.test(u.sha256_email_address)) { o.sha256_email_address = u.sha256_email_address; }\n  if (/^[0-9a-f]{64}$/.test(u.sha256_phone_number)) { o.sha256_phone_number = u.sha256_phone_number; }\n  return (o.sha256_email_address || o.sha256_phone_number) ? o : undefined;\n}"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "18",
+                "name": "LU3G - Dati forniti dall'utente",
+                "type": "awec",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "mode",
+                        "value": "CODE"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "dataSource",
+                        "value": "{{LU3G - user_data (hash)}}"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "19",
+                "name": "LU3G - page_location pulita",
+                "type": "jsm",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "javascript",
+                        "value": "function () {\n  // Indirizzo senza query string né frammento (possono contenere dati compilati).\n  return location.origin + location.pathname;\n}"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "20",
+                "name": "LU3G - GA4 Measurement ID",
+                "type": "c",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "value",
+                        "value": "G-SOSTITUISCI"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "21",
+                "name": "LU3G - Ads Conversion ID",
+                "type": "c",
+                "parameter": [
+                    {
+                        "type": "TEMPLATE",
+                        "key": "value",
+                        "value": "SOSTITUISCI"
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "variableId": "22",
+                "name": "LU3G - Ads Conversion Label",
+                "type": "smm",
+                "parameter": [
+                    {
+                        "type": "BOOLEAN",
+                        "key": "setDefaultValue",
+                        "value": "false"
+                    },
+                    {
+                        "type": "TEMPLATE",
+                        "key": "input",
+                        "value": "{{LU3G - conversion_key}}"
+                    },
+                    {
+                        "type": "LIST",
+                        "key": "map",
+                        "list": [
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "lead"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "SOSTITUISCI_ETICHETTA_LEAD"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "contact_whatsapp"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "SOSTITUISCI_ETICHETTA_CONTACT_WHATSAPP"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "contact_phone"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "SOSTITUISCI_ETICHETTA_CONTACT_PHONE"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "MAP",
+                                "map": [
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "key",
+                                        "value": "contact_email"
+                                    },
+                                    {
+                                        "type": "TEMPLATE",
+                                        "key": "value",
+                                        "value": "SOSTITUISCI_ETICHETTA_CONTACT_EMAIL"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "builtInVariable": [
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "type": "EVENT",
+                "name": "Event"
+            }
+        ],
+        "customTemplate": [
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "templateId": "1",
+                "name": "LU3G CT Bridge",
+                "templateData": "___TERMS_OF_SERVICE___\n\nBy creating or modifying this file you agree to Google Tag Manager's Community\nTemplate Gallery Developer Terms of Service available at\nhttps://developers.google.com/tag-manager/gallery-tos (or such other URL as\nGoogle may provide), as modified from time to time.\n\n\n___INFO___\n\n{\n  \"type\": \"TAG\",\n  \"id\": \"cvt_temp_public_id\",\n  \"version\": 1,\n  \"securityGroups\": [],\n  \"displayName\": \"LU3G CT Bridge\",\n  \"categories\": [\n    \"UTILITY\"\n  ],\n  \"brand\": {\n    \"id\": \"brand_dummy\",\n    \"displayName\": \"LU3G\"\n  },\n  \"description\": \"Bridge diagnostico di LU3G Conversion Tracker: dopo un evento lead_submit/contact_click restituisce alla pagina event_id, ID del container e stato dei tag (addEventCallback). Nessun dato personale.\",\n  \"containerContexts\": [\n    \"WEB\"\n  ]\n}\n\n\n___TEMPLATE_PARAMETERS___\n\n[]\n\n\n___SANDBOXED_JS_FOR_WEB_TEMPLATE___\n\n// LU3G CT Bridge: quando tutti i tag di questo evento hanno finito (o è scaduto il timeout dell'evento),\n// passa a window.lu3gCTBridge l'event_id del plugin, l'ID del container e, per ogni tag, id, stato, durata e i\n// metadati \"lu3g_role\" e \"name\" (impostati nei tag GA4/Ads del container LU3G). La funzione esiste solo durante una\n// sessione di verifica del plugin: altrimenti callInWindow non fa nulla.\nconst addEventCallback = require('addEventCallback');\nconst callInWindow = require('callInWindow');\nconst copyFromDataLayer = require('copyFromDataLayer');\n\nconst eventId = copyFromDataLayer('lu3g.event_id');\n\naddEventCallback(function (containerId, eventData) {\n  const out = [];\n  const list = (eventData && eventData.tags) ? eventData.tags : [];\n  for (let i = 0; i < list.length; i++) {\n    const t = list[i];\n    out.push({\n      id: t.id,\n      status: t.status,\n      executionTime: t.executionTime,\n      role: t.lu3g_role || '',\n      name: t.name || ''\n    });\n  }\n  callInWindow('lu3gCTBridge', { event_id: eventId, container_id: containerId, tags: out });\n});\n\ndata.gtmOnSuccess();\n\n\n___WEB_PERMISSIONS___\n\n[\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"read_event_metadata\",\n        \"versionId\": \"1\"\n      },\n      \"param\": []\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"access_globals\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"keys\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"lu3gCTBridge\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  }\n                ]\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"read_data_layer\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"allowedKeys\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"specific\"\n          }\n        },\n        {\n          \"key\": \"keyPatterns\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 1,\n                \"string\": \"lu3g.event_id\"\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  }\n]\n\n\n___TESTS___\n\nscenarios: []\n\n\n___NOTES___\n\nCreato da LU3G Conversion Tracker. Si attiva sugli eventi del plugin (lead_submit, contact_click ed eventi alternativi).\n"
+            }
+        ]
+    }
+}
