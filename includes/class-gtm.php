@@ -2,6 +2,8 @@
 /**
  * Configurazione di Google Tag Manager da importare (Amministrazione → Importa container → Unisci).
  *
+ * Per il container completo (export del sito + LU3G, sicuro anche con Sovrascrivi) vedi LU3G_CT_GTM_Merge.
+ *
  * Generata con gli ID impostati nel pannello (GA4, ID conversione Ads, etichette per chiave di conversione) e con gli
  * eventi effettivi dei form. Contiene solo elementi con il prefisso "LU3G -": non tocca gli altri tag del container.
  * - Variabili del dataLayer per lu3g.* e lu3g_user_data; "LU3G - user_data (hash)" restituisce solo chiavi sha256_*
@@ -379,7 +381,8 @@ final class LU3G_CT_GTM {
 					'path'         => 'accounts/' . self::ACCOUNT . '/containers/' . self::CONTAINER,
 					'accountId'    => self::ACCOUNT,
 					'containerId'  => self::CONTAINER,
-					'name'         => 'LU3G Conversion Tracker',
+					// Il nome compare nella schermata di importazione di GTM: ricorda di usare Unisci.
+					'name'         => 'SOLO LU3G - importa con UNISCI, non Sovrascrivi',
 					'publicId'     => '' !== $g['container_id'] ? $g['container_id'] : 'GTM-XXXXXXX',
 					'usageContext' => array( 'WEB' ),
 				),

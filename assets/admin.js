@@ -186,6 +186,95 @@
 		} );
 	} );
 
+	/* ------------------------------------------------ file completo per GTM: export del sito + elementi LU3G */
+
+	var full = page.querySelector( '[data-gtm-full]' );
+	var rep = page.querySelector( '[data-gtm-report]' );
+	function el( tag, cls, text ) {
+		var e = document.createElement( tag );
+		if ( cls ) {
+			e.className = cls;
+		}
+		if ( text !== undefined ) {
+			e.textContent = text;
+		}
+		return e;
+	}
+	function section( title, items, open ) {
+		var d = el( 'details', 'ct-advanced ct-advanced--inline' );
+		d.open = !! open;
+		d.appendChild( el( 'summary', '', title + ' (' + items.length + ')' ) );
+		var ul = el( 'ul', 'ct-list' );
+		items.forEach( function ( t ) {
+			ul.appendChild( el( 'li', '', t ) );
+		} );
+		d.appendChild( ul );
+		return d;
+	}
+	function download( name, text ) {
+		var url = URL.createObjectURL( new Blob( [ text ], { type: 'application/json' } ) );
+		var a = el( 'a', 'ct-btn ct-btn--primary', 'Scarica di nuovo il file completo' );
+		a.href = url;
+		a.download = name;
+		return a;
+	}
+	if ( full && rep ) {
+		full.addEventListener( 'submit', function ( e ) {
+			e.preventDefault();
+			var input = full.querySelector( 'input[type="file"]' );
+			var file = input && input.files && input.files[ 0 ];
+			if ( ! file ) {
+				toast( 'Scegli il file esportato da GTM.', true );
+				return;
+			}
+			var btn = full.querySelector( '[type="submit"]' );
+			btn.disabled = true;
+			file.text().then( function ( text ) {
+				return call( 'gtm_full', { pause: full.querySelector( 'input[name="pause"]' ).checked }, { container: text } );
+			} ).then( function ( d ) {
+				var r = d.report;
+				var c = r.counts;
+				rep.textContent = '';
+				rep.appendChild( el( 'h4', '', 'Riepilogo' ) );
+				rep.appendChild( el( 'p', 'ct-help', 'Restano come sono ' + c.kept + ' elementi del sito. LU3G: ' + c.added + ' aggiunti, ' + c.updated + ' aggiornati, ' + c.same + ' già uguali, ' + c.removed + ' tolti. Vecchi tag messi in pausa: ' + c.paused + '.' ) );
+				if ( r.notes.length ) {
+					r.notes.forEach( function ( n ) {
+						rep.appendChild( el( 'p', 'ct-warn', n ) );
+					} );
+				}
+				if ( c.updated ) {
+					rep.appendChild( section( 'Elementi LU3G aggiornati', r.updated, true ) );
+				}
+				if ( c.added ) {
+					rep.appendChild( section( 'Elementi LU3G aggiunti', r.added, c.added < 12 ) );
+				}
+				if ( c.removed ) {
+					rep.appendChild( section( 'Elementi LU3G tolti (non più usati dal plugin)', r.removed, true ) );
+				}
+				if ( c.paused ) {
+					rep.appendChild( section( 'Vecchi tag messi in pausa', r.paused, true ) );
+				}
+				rep.appendChild( section( 'Elementi del sito che restano come sono', r.kept, false ) );
+				if ( ! c.added && ! c.updated && ! c.removed && ! c.paused ) {
+					rep.appendChild( el( 'p', 'ct-help', 'Il container è già aggiornato: non serve importare niente.' ) );
+				}
+				var a = download( d.filename, d.json );
+				var row = el( 'div', 'ct-inline' );
+				row.appendChild( a );
+				rep.appendChild( row );
+				rep.appendChild( el( 'p', 'ct-help', 'In GTM, prima di confermare l\'importazione, i numeri devono corrispondere a questo riepilogo.' ) );
+				rep.hidden = false;
+				a.click();
+				toast( d.message );
+			} ).catch( function ( err ) {
+				rep.hidden = true;
+				toast( err.message, true );
+			} ).then( function () {
+				btn.disabled = false;
+			} );
+		} );
+	}
+
 	/* ------------------------------------------------ test locale: stesse funzioni del sito, nessun push */
 
 	var run = page.querySelector( '[data-run-local]' );

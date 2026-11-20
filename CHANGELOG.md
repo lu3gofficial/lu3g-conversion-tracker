@@ -1,5 +1,24 @@
 # Registro delle modifiche
 
+## 1.3.0
+- **File completo per GTM** (scheda GTM): carichi l'export del container live e il plugin restituisce tutto il
+  container con gli elementi LU3G aggiunti o aggiornati. Si può importare anche con "Sovrascrivi" senza perdere niente.
+  Nasce da un caso reale: il file "solo LU3G" importato con "Sovrascrivi" ha cancellato banner Iubenda, Google tag e
+  linker del container.
+  - Elementi del sito invariati (ID, cartelle, stato di pausa, formattazione); elementi LU3G aggiornati per nome con ID
+    e cartella mantenuti; ID nuovi dopo il più alto del container; attivatori e modelli dei tag LU3G riallineati.
+  - Elementi LU3G non più generati tolti (attivatori, variabili e modelli solo se nessuno li usa).
+  - Niente Linker LU3G se il container ne ha già uno attivo.
+  - Facoltativo, attivo di serie: mette in pausa i vecchi tag attivi che partono sugli stessi eventi LU3G e il vecchio
+    pixel base Meta quando il file contiene quello LU3G.
+  - Controlli: rifiuta il file del plugin al posto dell'export, i container non Web e un container con ID diverso da
+    quello impostato nel plugin. Riepilogo nel pannello (aggiunti, aggiornati, già uguali, tolti, messi in pausa).
+- **File "solo LU3G"**: avviso in evidenza "importa SEMPRE con Unisci"; nome del file e del container che lo ricordano
+  (compare nella schermata di importazione di GTM); istruzioni corrette: "Sovrascrivi in conflitto" invece di
+  "Rinomina", che a una nuova importazione duplicava i tag LU3G.
+- Correzione delle istruzioni della 1.2.1: "Sovrascrivi" vale solo per i conflitti dentro "Unisci", mai come scelta
+  principale con il file solo LU3G.
+
 ## 1.2.1
 - **File per GTM, pixel Meta**: il tag "LU3G - Meta - Pixel base" era impostato "una volta per pagina". Al caricamento
   il consenso non è ancora confermato (il modello Iubenda lo aggiorna poco dopo), GTM bloccava il tag e lo considerava

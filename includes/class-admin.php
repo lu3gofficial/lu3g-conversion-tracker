@@ -392,19 +392,37 @@ final class LU3G_CT_Admin {
 		self::savebar();
 		echo '</form>';
 
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Scarica e importa', 'lu3g-conversion-tracker' ) . '</h3>';
+		echo '<div class="ct-card"><h3>' . esc_html__( 'File completo per GTM (consigliato)', 'lu3g-conversion-tracker' ) . '</h3>';
 		if ( $missing ) {
 			echo '<p class="ct-warn">' . esc_html__( 'Mancano ancora: ', 'lu3g-conversion-tracker' ) . esc_html( implode( '; ', $missing ) ) . '. ' . esc_html__( 'Nel file restano come SOSTITUISCI.', 'lu3g-conversion-tracker' ) . '</p>';
 		}
 		/* translators: 1: eventi form, 2: evento contatti */
-		echo '<p class="ct-help">' . esc_html( sprintf( __( 'Eventi inclusi: %1$s; %2$s.', 'lu3g-conversion-tracker' ), implode( ', ', $events ), $g['contact_event'] ) ) . '</p>';
-		echo '<div class="ct-inline"><a class="ct-btn ct-btn--primary" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica il file per GTM (JSON)', 'lu3g-conversion-tracker' ) . '</a></div>';
+		echo '<p class="ct-help">' . esc_html__( 'Carichi l\'export del container che c\'è adesso in GTM e il plugin ti restituisce TUTTO il container: banner dei cookie, Google tag, linker e i tuoi tag restano come sono, gli elementi LU3G vengono aggiunti o aggiornati. Così in GTM puoi importarlo anche con "Sovrascrivi" senza perdere niente.', 'lu3g-conversion-tracker' ) . ' ' . esc_html( sprintf( __( 'Eventi inclusi: %1$s; %2$s.', 'lu3g-conversion-tracker' ), implode( ', ', $events ), $g['contact_event'] ) ) . '</p>';
 		echo '<ol class="ct-steps">';
 		$steps = array(
-			__( 'tagmanager.google.com → il container del sito → Amministrazione → Importa container → scegli il file → area di lavoro Nuova → Unisci → "Rinomina i tag, gli attivatori e le variabili in conflitto".', 'lu3g-conversion-tracker' ),
-			__( 'Metti in pausa i vecchi tag che partivano sugli stessi eventi (lead_submit, contact_click): conversioni GA4, Google Ads e Meta create prima del plugin. I nuovi iniziano con "LU3G -". Tieni i Google tag base (GA4, Ads) e il banner dei cookie.', 'lu3g-conversion-tracker' ),
-			__( 'Anteprima: invia un form e clicca un contatto. Da amministratore gli eventi sono di test e i tag LU3G di produzione non partono (corretto); in incognito partono.', 'lu3g-conversion-tracker' ),
-			__( 'Invia → Pubblica. In Google Ads: Obiettivi → Impostazioni → "Uso dei dati dei clienti" → attiva le conversioni avanzate.', 'lu3g-conversion-tracker' ),
+			__( 'In GTM: Amministrazione → Esporta container → scegli la versione LIVE (quella pubblicata) → Esporta. Fallo subito prima: il file deve essere quello attuale.', 'lu3g-conversion-tracker' ),
+			__( 'Caricalo qui sotto e premi "Crea il file completo". Leggi il riepilogo: cosa resta, cosa si aggiunge, cosa si aggiorna.', 'lu3g-conversion-tracker' ),
+			__( 'In GTM: Amministrazione → Importa container → il file completo → area di lavoro Esistente (Default Workspace) → Sovrascrivi, oppure Unisci + "Sovrascrivi in conflitto". Prima di confermare controlla che i numeri di GTM corrispondano al riepilogo.', 'lu3g-conversion-tracker' ),
+			__( 'Anteprima, poi Invia → Pubblica.', 'lu3g-conversion-tracker' ),
+		);
+		foreach ( $steps as $s ) {
+			echo '<li>' . esc_html( $s ) . '</li>';
+		}
+		echo '</ol>';
+		echo '<form class="ct-gtmfull" data-gtm-full autocomplete="off"><label class="ct-field"><span>' . esc_html__( 'Export del container (JSON scaricato da GTM)', 'lu3g-conversion-tracker' ) . '</span><input type="file" class="ct-input" name="container" accept=".json,application/json" required></label>';
+		self::toggle( 'pause', __( 'Metti in pausa i vecchi tag doppi', 'lu3g-conversion-tracker' ), true, __( 'Tag del sito ancora attivi che partono sugli stessi eventi dei tag LU3G (conterebbero due volte) e il vecchio pixel base Meta se il file contiene quello LU3G. Li trovi nel riepilogo.', 'lu3g-conversion-tracker' ) );
+		echo '<div class="ct-inline"><button type="submit" class="ct-btn ct-btn--primary">' . esc_html__( 'Crea il file completo', 'lu3g-conversion-tracker' ) . '</button></div></form>';
+		echo '<div class="ct-gtmreport" data-gtm-report hidden></div></div>';
+
+		echo '<div class="ct-card"><h3>' . esc_html__( 'Solo gli elementi LU3G', 'lu3g-conversion-tracker' ) . '</h3>';
+		echo '<p class="ct-warn"><strong>' . esc_html__( 'Questo file va importato SEMPRE con "Unisci".', 'lu3g-conversion-tracker' ) . '</strong> ' . esc_html__( 'Contiene solo i tag LU3G: con "Sovrascrivi" GTM cancella tutto il resto del container (banner dei cookie, Google tag, linker…). Se hai dubbi usa il file completo qui sopra.', 'lu3g-conversion-tracker' ) . '</p>';
+		echo '<div class="ct-inline"><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica solo LU3G (da importare con Unisci)', 'lu3g-conversion-tracker' ) . '</a></div>';
+		echo '<ol class="ct-steps">';
+		$steps = array(
+			__( 'GTM → Amministrazione → Importa container → il file → area di lavoro Esistente → Unisci (MAI Sovrascrivi) → "Sovrascrivi i tag, gli attivatori e le variabili in conflitto" (così una nuova importazione aggiorna i tag LU3G invece di duplicarli).', 'lu3g-conversion-tracker' ),
+			__( 'Prima di confermare: nell\'anteprima di GTM non devono esserci elementi eliminati.', 'lu3g-conversion-tracker' ),
+			__( 'Metti in pausa i vecchi tag che partivano sugli stessi eventi (lead_submit, contact_click). Tieni i Google tag base (GA4, Ads) e il banner dei cookie.', 'lu3g-conversion-tracker' ),
+			__( 'Anteprima: invia un form e clicca un contatto. Da amministratore gli eventi sono di test e i tag LU3G di produzione non partono (corretto); in incognito partono. Poi Invia → Pubblica. In Google Ads: Obiettivi → Impostazioni → "Uso dei dati dei clienti" → attiva le conversioni avanzate.', 'lu3g-conversion-tracker' ),
 		);
 		foreach ( $steps as $s ) {
 			echo '<li>' . esc_html( $s ) . '</li>';
@@ -560,6 +578,29 @@ final class LU3G_CT_Admin {
 				wp_send_json_success( array( 'message' => __( 'Salvato in Elementor.', 'lu3g-conversion-tracker' ), 'reload' => true ) );
 				break;
 
+			case 'gtm_full':
+				$raw = isset( $_POST['container'] ) ? (string) wp_unslash( $_POST['container'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON controllato da LU3G_CT_GTM_Merge::parse
+				if ( strlen( $raw ) > 15 * 1024 * 1024 ) {
+					wp_send_json_error( array( 'message' => __( 'File troppo grande.', 'lu3g-conversion-tracker' ) ) );
+				}
+				$g = LU3G_CT_Settings::get();
+				$p = LU3G_CT_GTM_Merge::parse( $raw, (string) $g['container_id'] );
+				if ( ! $p['ok'] ) {
+					wp_send_json_error( array( 'message' => $p['error'] ) );
+				}
+				$events = array_values( array_unique( array_merge( LU3G_CT_GTM::form_events(), array( $g['contact_event'] ) ) ) );
+				$r      = LU3G_CT_GTM_Merge::merge( $p['data'], LU3G_CT_GTM::container(), array( 'events' => $events, 'pause_duplicates' => ! empty( $data['pause'] ) ) );
+				$pub    = (string) ( $p['data']['containerVersion']['container']['publicId'] ?? 'gtm' );
+				wp_send_json_success(
+					array(
+						'message'  => __( 'File completo pronto.', 'lu3g-conversion-tracker' ),
+						'report'   => $r['report'],
+						'json'     => wp_json_encode( LU3G_CT_GTM_Merge::for_json( $r['container'] ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ),
+						'filename' => sanitize_file_name( $pub . '-COMPLETO-lu3g-' . gmdate( 'Ymd-Hi' ) . '.json' ),
+					)
+				);
+				break;
+
 			case 'rescan':
 				$c = LU3G_CT_Forms::scan();
 				/* translators: %d: numero */
@@ -595,7 +636,7 @@ final class LU3G_CT_Admin {
 	public static function download_gtm() {
 		self::guard_download();
 		header( 'Content-Type: application/json; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="lu3g-conversion-tracker-gtm-' . gmdate( 'Ymd' ) . '.json"' );
+		header( 'Content-Disposition: attachment; filename="lu3g-SOLO-LU3G-importa-con-UNISCI-' . gmdate( 'Ymd' ) . '.json"' );
 		echo wp_json_encode( LU3G_CT_GTM::container(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON da scaricare
 		exit;
 	}

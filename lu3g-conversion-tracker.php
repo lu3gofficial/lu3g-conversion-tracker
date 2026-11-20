@@ -3,7 +3,7 @@
  * Plugin Name:       LU3G Conversion Tracker
  * Plugin URI:        https://github.com/lu3gofficial/lu3g-conversion-tracker
  * Description:       Conversioni dei form di Elementor Pro (lead_submit) e click su WhatsApp, telefono ed email nel dataLayer di Google Tag Manager, con identificatori normalizzati e cifrati (SHA-256) per le conversioni avanzate di Google Ads, rispetto del consenso e diagnostica.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            LU3G Agenzia Web
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LU3G_CT_VERSION', '1.2.1' );
+define( 'LU3G_CT_VERSION', '1.3.0' );
 define( 'LU3G_CT_FILE', __FILE__ );
 define( 'LU3G_CT_URL', plugin_dir_url( __FILE__ ) );
 define( 'LU3G_CT_PATH', plugin_dir_path( __FILE__ ) );
@@ -41,6 +41,7 @@ function lu3g_ct_boot() {
 	require_once LU3G_CT_PATH . 'includes/class-frontend.php';
 	require_once LU3G_CT_PATH . 'includes/class-diagnostics.php';
 	require_once LU3G_CT_PATH . 'includes/class-gtm.php';
+	require_once LU3G_CT_PATH . 'includes/class-gtm-merge.php';
 
 	LU3G_CT_Forms::init();
 	LU3G_CT_Frontend::init();

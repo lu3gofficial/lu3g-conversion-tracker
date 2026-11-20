@@ -163,9 +163,18 @@ GA4 "User-provided data" richiede un'integrazione separata e non è attiva. `lea
 `generate_lead` va fatto apposta e in sostituzione.
 
 ## Configurazione GTM
-Pannello → **GTM**: inserisci ID GA4, ID conversione Ads ed etichette per chiave, poi scarica il JSON e importalo in GTM
-(Amministrazione → Importa container → Unisci). In alternativa usa `gtm/lu3g-conversion-tracker-container.json` e
-sostituisci i valori `SOSTITUISCI`. La guida manuale equivalente è in [gtm/README.md](gtm/README.md).
+Pannello → **GTM**: inserisci ID GA4, ID conversione Ads ed etichette per chiave. Poi i file sono due:
+
+- **File completo (consigliato).** Esporta da GTM il container live (Amministrazione → Esporta container), caricalo nel
+  pannello e scarica il container completo: tutti gli elementi del sito restano come sono (stessi ID, cartelle, pausa),
+  gli elementi LU3G vengono aggiunti o aggiornati per nome, quelli non più generati vengono tolti, i vecchi tag che
+  partono sugli stessi eventi possono essere messi in pausa. Il pannello mostra il riepilogo. Si importa con
+  Sovrascrivi oppure con Unisci + "Sovrascrivi in conflitto": in entrambi i casi non si perde niente.
+- **Solo LU3G.** Contiene solo gli elementi LU3G: va importato **sempre con Unisci** (+ "Sovrascrivi in conflitto").
+  Con "Sovrascrivi" GTM sostituisce l'intero container e cancella banner dei cookie, Google tag e tutto il resto.
+
+In alternativa usa `gtm/lu3g-conversion-tracker-container.json` e sostituisci i valori `SOSTITUISCI`. La guida manuale
+equivalente è in [gtm/README.md](gtm/README.md).
 
 Salvare le impostazioni in WordPress non aggiorna GTM. Dopo aver cambiato nomi evento, chiavi o etichette, scarica di
 nuovo il JSON e importalo. Il plugin non pubblica niente nei container.
