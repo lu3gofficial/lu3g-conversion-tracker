@@ -33,6 +33,7 @@ final class LU3G_CT_Settings {
 			'container_id'    => '',          // GTM-XXXX atteso (solo diagnostica)
 			// Consenso
 			'consent'         => 'consent_mode', // consent_mode | iubenda | custom | none
+			'consent_events'  => '^iubenda_',    // regex degli eventi del CMP per il tag "LU3G - Ponte consenso" in GTM
 			// Test
 			'test_mode'       => false,       // test_mode:true su tutti gli eventi
 			'admins_test'     => true,        // amministratori collegati: test_mode:true
@@ -132,6 +133,14 @@ final class LU3G_CT_Settings {
 		}
 		if ( array_key_exists( 'consent', $in ) ) {
 			$cur['consent'] = in_array( $in['consent'], array( 'consent_mode', 'iubenda', 'custom', 'none' ), true ) ? $in['consent'] : 'consent_mode';
+		}
+		if ( array_key_exists( 'consent_events', $in ) ) {
+			$v = trim( (string) $in['consent_events'] );
+			if ( '' === $v || false === @preg_match( '/' . str_replace( '/', '\\/', $v ) . '/', '' ) || strlen( $v ) > 200 ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- solo per sapere se la regex è valida
+				$errors['consent_events'] = __( 'Espressione regolare non valida (es. ^iubenda_).', 'lu3g-conversion-tracker' );
+			} else {
+				$cur['consent_events'] = $v;
+			}
 		}
 		if ( array_key_exists( 'contact_exclude', $in ) ) {
 			$cur['contact_exclude'] = substr( sanitize_textarea_field( (string) $in['contact_exclude'] ), 0, 1000 );

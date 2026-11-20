@@ -435,6 +435,21 @@
                 "consentSettings": {
                     "consentStatus": "NOT_SET"
                 }
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "tagId": "6",
+                "name": "LU3G - Ponte consenso",
+                "type": "cvt_100000000_2",
+                "parameter": [],
+                "firingTriggerId": [
+                    "5"
+                ],
+                "tagFiringOption": "ONCE_PER_EVENT",
+                "consentSettings": {
+                    "consentStatus": "NOT_SET"
+                }
             }
         ],
         "trigger": [
@@ -595,6 +610,30 @@
                                 "type": "TEMPLATE",
                                 "key": "arg1",
                                 "value": "^(lead_submit|contact_click)$"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "triggerId": "5",
+                "name": "LU3G - eventi del CMP (ponte consenso)",
+                "type": "CUSTOM_EVENT",
+                "customEventFilter": [
+                    {
+                        "type": "MATCH_REGEX",
+                        "parameter": [
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg0",
+                                "value": "{{_event}}"
+                            },
+                            {
+                                "type": "TEMPLATE",
+                                "key": "arg1",
+                                "value": "^iubenda_"
                             }
                         ]
                     }
@@ -1162,6 +1201,13 @@
                 "templateId": "1",
                 "name": "LU3G CT Bridge",
                 "templateData": "___TERMS_OF_SERVICE___\n\nBy creating or modifying this file you agree to Google Tag Manager's Community\nTemplate Gallery Developer Terms of Service available at\nhttps://developers.google.com/tag-manager/gallery-tos (or such other URL as\nGoogle may provide), as modified from time to time.\n\n\n___INFO___\n\n{\n  \"type\": \"TAG\",\n  \"id\": \"cvt_temp_public_id\",\n  \"version\": 1,\n  \"securityGroups\": [],\n  \"displayName\": \"LU3G CT Bridge\",\n  \"categories\": [\n    \"UTILITY\"\n  ],\n  \"brand\": {\n    \"id\": \"brand_dummy\",\n    \"displayName\": \"LU3G\"\n  },\n  \"description\": \"Bridge diagnostico di LU3G Conversion Tracker: dopo un evento lead_submit/contact_click restituisce alla pagina event_id, ID del container e stato dei tag (addEventCallback). Nessun dato personale.\",\n  \"containerContexts\": [\n    \"WEB\"\n  ]\n}\n\n\n___TEMPLATE_PARAMETERS___\n\n[]\n\n\n___SANDBOXED_JS_FOR_WEB_TEMPLATE___\n\n// LU3G CT Bridge: quando tutti i tag di questo evento hanno finito (o è scaduto il timeout dell'evento),\n// passa a window.lu3gCTBridge l'event_id del plugin, l'ID del container e, per ogni tag, id, stato, durata e i\n// metadati \"lu3g_role\" e \"name\" (impostati nei tag GA4/Ads del container LU3G). La funzione esiste solo durante una\n// sessione di verifica del plugin: altrimenti callInWindow non fa nulla.\nconst addEventCallback = require('addEventCallback');\nconst callInWindow = require('callInWindow');\nconst copyFromDataLayer = require('copyFromDataLayer');\n\nconst eventId = copyFromDataLayer('lu3g.event_id');\n\naddEventCallback(function (containerId, eventData) {\n  const out = [];\n  const list = (eventData && eventData.tags) ? eventData.tags : [];\n  for (let i = 0; i < list.length; i++) {\n    const t = list[i];\n    out.push({\n      id: t.id,\n      status: t.status,\n      executionTime: t.executionTime,\n      role: t.lu3g_role || '',\n      name: t.name || ''\n    });\n  }\n  callInWindow('lu3gCTBridge', { event_id: eventId, container_id: containerId, tags: out });\n});\n\ndata.gtmOnSuccess();\n\n\n___WEB_PERMISSIONS___\n\n[\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"read_event_metadata\",\n        \"versionId\": \"1\"\n      },\n      \"param\": []\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"access_globals\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"keys\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"key\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"read\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"write\"\n                  },\n                  {\n                    \"type\": 1,\n                    \"string\": \"execute\"\n                  }\n                ],\n                \"mapValue\": [\n                  {\n                    \"type\": 1,\n                    \"string\": \"lu3gCTBridge\"\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": false\n                  },\n                  {\n                    \"type\": 8,\n                    \"boolean\": true\n                  }\n                ]\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"read_data_layer\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"allowedKeys\",\n          \"value\": {\n            \"type\": 1,\n            \"string\": \"specific\"\n          }\n        },\n        {\n          \"key\": \"keyPatterns\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 1,\n                \"string\": \"lu3g.event_id\"\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  }\n]\n\n\n___TESTS___\n\nscenarios: []\n\n\n___NOTES___\n\nCreato da LU3G Conversion Tracker. Si attiva sugli eventi del plugin (lead_submit, contact_click ed eventi alternativi).\n"
+            },
+            {
+                "accountId": "6000000000",
+                "containerId": "100000000",
+                "templateId": "2",
+                "name": "LU3G CT Consent",
+                "templateData": "___TERMS_OF_SERVICE___\n\nBy creating or modifying this file you agree to Google Tag Manager's Community\nTemplate Gallery Developer Terms of Service available at\nhttps://developers.google.com/tag-manager/gallery-tos (or such other URL as\nGoogle may provide), as modified from time to time.\n\n\n___INFO___\n\n{\n  \"type\": \"TAG\",\n  \"id\": \"cvt_temp_public_id\",\n  \"version\": 1,\n  \"securityGroups\": [],\n  \"displayName\": \"LU3G CT Consent\",\n  \"categories\": [\n    \"UTILITY\"\n  ],\n  \"brand\": {\n    \"id\": \"brand_dummy\",\n    \"displayName\": \"LU3G\"\n  },\n  \"description\": \"Ponte del consenso di LU3G Conversion Tracker: quando il CMP che lavora dentro GTM (es. il modello Iubenda) ha impostato o aggiornato il consenso, scrive nella pagina lo stato di analytics_storage, ad_storage, ad_user_data e ad_personalization. Nessun dato personale.\",\n  \"containerContexts\": [\n    \"WEB\"\n  ]\n}\n\n\n___TEMPLATE_PARAMETERS___\n\n[]\n\n\n___SANDBOXED_JS_FOR_WEB_TEMPLATE___\n\n// LU3G CT Consent: si attiva solo sugli eventi del CMP (es. iubenda_gtm_consent_event), cioè dopo che il CMP ha\n// impostato il consenso dentro GTM. Così uno stato \"non impostato\" (che isConsentGranted considera concesso) non viene\n// mai scambiato per un consenso: il plugin usa questo stato solo perché arriva da un evento del CMP.\nconst isConsentGranted = require('isConsentGranted');\nconst setInWindow = require('setInWindow');\nconst getTimestampMillis = require('getTimestampMillis');\nconst copyFromDataLayer = require('copyFromDataLayer');\n\nconst types = ['analytics_storage', 'ad_storage', 'ad_user_data', 'ad_personalization'];\nconst state = { source: 'gtm', event: copyFromDataLayer('event') || '', time: getTimestampMillis() };\nfor (let i = 0; i < types.length; i++) {\n  state[types[i]] = isConsentGranted(types[i]) ? 'granted' : 'denied';\n}\nsetInWindow('lu3gCTConsentGTM', state, true);\n\ndata.gtmOnSuccess();\n\n\n___WEB_PERMISSIONS___\n\n[\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"access_consent\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"consentTypes\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  { \"type\": 1, \"string\": \"consentType\" },\n                  { \"type\": 1, \"string\": \"read\" },\n                  { \"type\": 1, \"string\": \"write\" }\n                ],\n                \"mapValue\": [\n                  { \"type\": 1, \"string\": \"analytics_storage\" },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": false }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  { \"type\": 1, \"string\": \"consentType\" },\n                  { \"type\": 1, \"string\": \"read\" },\n                  { \"type\": 1, \"string\": \"write\" }\n                ],\n                \"mapValue\": [\n                  { \"type\": 1, \"string\": \"ad_storage\" },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": false }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  { \"type\": 1, \"string\": \"consentType\" },\n                  { \"type\": 1, \"string\": \"read\" },\n                  { \"type\": 1, \"string\": \"write\" }\n                ],\n                \"mapValue\": [\n                  { \"type\": 1, \"string\": \"ad_user_data\" },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": false }\n                ]\n              },\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  { \"type\": 1, \"string\": \"consentType\" },\n                  { \"type\": 1, \"string\": \"read\" },\n                  { \"type\": 1, \"string\": \"write\" }\n                ],\n                \"mapValue\": [\n                  { \"type\": 1, \"string\": \"ad_personalization\" },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": false }\n                ]\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"access_globals\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"keys\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              {\n                \"type\": 3,\n                \"mapKey\": [\n                  { \"type\": 1, \"string\": \"key\" },\n                  { \"type\": 1, \"string\": \"read\" },\n                  { \"type\": 1, \"string\": \"write\" },\n                  { \"type\": 1, \"string\": \"execute\" }\n                ],\n                \"mapValue\": [\n                  { \"type\": 1, \"string\": \"lu3gCTConsentGTM\" },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": true },\n                  { \"type\": 8, \"boolean\": false }\n                ]\n              }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  },\n  {\n    \"instance\": {\n      \"key\": {\n        \"publicId\": \"read_data_layer\",\n        \"versionId\": \"1\"\n      },\n      \"param\": [\n        {\n          \"key\": \"allowedKeys\",\n          \"value\": { \"type\": 1, \"string\": \"specific\" }\n        },\n        {\n          \"key\": \"keyPatterns\",\n          \"value\": {\n            \"type\": 2,\n            \"listItem\": [\n              { \"type\": 1, \"string\": \"event\" }\n            ]\n          }\n        }\n      ]\n    },\n    \"clientAnnotations\": {\n      \"isEditedByUser\": true\n    },\n    \"isRequired\": true\n  }\n]\n\n\n___TESTS___\n\nscenarios: []\n\n\n___NOTES___\n\nCreato da LU3G Conversion Tracker 1.1.0. Attivatore consigliato: eventi del CMP (Iubenda: regex ^iubenda_).\n"
             }
         ]
     }

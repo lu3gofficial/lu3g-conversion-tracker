@@ -11,6 +11,8 @@
  *   ID transazione = event_id, conversioni avanzate con la variabile dei dati utente. I dati utente vanno solo a questo
  *   tag, non a un Google tag condiviso.
  * - Linker conversioni, bridge diagnostico (modello personalizzato gtm/lu3g-ct-bridge.tpl).
+ * - Ponte del consenso (gtm/lu3g-ct-consent.tpl, 1.1.0): sugli eventi del CMP scrive nella pagina lo stato dei segnali
+ *   di consenso, per i CMP che lavorano dentro GTM (es. Iubenda con googleConsentMode "template").
  * - Attivatori di produzione con test_mode = false: gli eventi di test non arrivano ai tag.
  * Formato: exportFormatVersion 2, come gli export di GTM. Va verificato in Anteprima prima di pubblicare.
  */
@@ -190,6 +192,7 @@ final class LU3G_CT_GTM {
 		$t_contact = $trig( 'LU3G - ' . $contact . ' (produzione)', $re( array( $contact ) ), array( $prod ) );
 		$t_ads     = $with_lbl ? $trig( 'LU3G - conversioni Google Ads (produzione)', $re( $all ), array( $prod, $cond( 'MATCH_REGEX', 'LU3G - conversion_key', $re( $with_lbl ) ) ) ) : null;
 		$t_bridge  = $trig( 'LU3G - tutti gli eventi (bridge diagnostico)', $re( $all ), array() );
+		$t_consent = $trig( 'LU3G - eventi del CMP (ponte consenso)', $g['consent_events'], array() );
 
 		// Tag
 		$tags = array();
@@ -302,8 +305,11 @@ final class LU3G_CT_GTM {
 			array( self::ALL_PAGES )
 		);
 		$tag( 'LU3G - Bridge diagnostico', 'cvt_' . self::CONTAINER . '_1', array(), array( $t_bridge ) );
+		// Ponte del consenso: scrive nella pagina lo stato dei 4 segnali dopo ogni evento del CMP (es. modello Iubenda).
+		$tag( 'LU3G - Ponte consenso', 'cvt_' . self::CONTAINER . '_2', array(), array( $t_consent ) );
 
-		$tpl = (string) file_get_contents( LU3G_CT_PATH . 'gtm/lu3g-ct-bridge.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- file locale del plugin
+		$tpl  = (string) file_get_contents( LU3G_CT_PATH . 'gtm/lu3g-ct-bridge.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- file locale del plugin
+		$tpl2 = (string) file_get_contents( LU3G_CT_PATH . 'gtm/lu3g-ct-consent.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- file locale del plugin
 
 		return array(
 			'exportFormatVersion' => 2,
@@ -339,6 +345,13 @@ final class LU3G_CT_GTM {
 						'templateId'   => '1',
 						'name'         => 'LU3G CT Bridge',
 						'templateData' => $tpl,
+					),
+					array(
+						'accountId'    => self::ACCOUNT,
+						'containerId'  => self::CONTAINER,
+						'templateId'   => '2',
+						'name'         => 'LU3G CT Consent',
+						'templateData' => $tpl2,
 					),
 				),
 			),

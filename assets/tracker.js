@@ -23,9 +23,10 @@
  * Un evento per attivazione; il link funziona come sempre. Non si inviano numero, indirizzo, testo del messaggio
  * o URL completo.
  *
- * CONSENSO: adapter "consent_mode" (comandi gtag('consent', ...) nel dataLayer, serve un "update" esplicito del CMP),
- * "iubenda" (come il precedente, più la presenza della Cookie Solution), "custom" (funzione window.lu3gCTConsent),
- * "none" (identificatori mai inviati). Uno stato assente o solo "default" = sconosciuto = niente identificatori.
+ * CONSENSO: adapter "consent_mode" (stato scritto dal ponte GTM "LU3G CT Consent" dopo un evento del CMP, oppure
+ * comandi gtag('consent', ...) nel dataLayer con un "update" esplicito del CMP), "iubenda" (come il precedente, più la
+ * presenza della Cookie Solution), "custom" (funzione window.lu3gCTConsent), "none" (identificatori mai inviati).
+ * Uno stato assente o solo "default" = sconosciuto = niente identificatori.
  */
 ( function () {
 	'use strict';
@@ -99,6 +100,21 @@
 			out.reason = 'Iubenda Cookie Solution non caricata';
 			return out;
 		}
+		// 1) Ponte GTM: lo scrive il modello "LU3G CT Consent" solo dopo un evento del CMP (es. modello Iubenda in GTM).
+		var b = window.lu3gCTConsentGTM;
+		if ( b && typeof b === 'object' && b.source === 'gtm' ) {
+			CONSENT_KEYS.forEach( function ( k ) {
+				if ( b[ k ] === 'granted' || b[ k ] === 'denied' ) {
+					out[ k ] = b[ k ];
+				}
+			} );
+			if ( out.ad_user_data ) {
+				out.ready = true;
+				out.via = 'ponte GTM' + ( b.event ? ' (' + String( b.event ).slice( 0, 40 ) + ')' : '' );
+				return out;
+			}
+		}
+		// 2) Comandi gtag('consent', ...) nel dataLayer.
 		var c = readConsentCommands();
 		CONSENT_KEYS.forEach( function ( k ) {
 			if ( c.st[ k ] ) {
@@ -106,10 +122,11 @@
 			}
 		} );
 		if ( ! c.updated ) {
-			out.reason = 'nessuna scelta espressa dal CMP (solo stato predefinito o nessuno)';
+			out.reason = 'nessuna scelta espressa dal CMP (solo stato predefinito o nessuno; se il CMP lavora dentro GTM serve il tag "LU3G - Ponte consenso")';
 			return out;
 		}
 		out.ready = true;
+		out.via = 'comandi consent nel dataLayer';
 		return out;
 	}
 
@@ -644,7 +661,7 @@
 		box.innerHTML = '<button type="button" aria-label="Chiudi" data-close>×</button><h4>LU3G Tracking · sessione di verifica</h4>' +
 			'<div>Gli eventi di questa sessione hanno <code>test_mode: true</code>.</div>' +
 			'<div>GTM: <span class="s-' + g.state + '">' + LABELS[ g.state ] + '</span> <small>' + esc( g.note ) + '</small></div>' +
-			'<div>Consenso (' + esc( C.consent ) + '): ' + ( cs.ready ? 'ad_user_data <b>' + esc( cs.ad_user_data || '—' ) + '</b>, ad_storage ' + esc( cs.ad_storage || '—' ) + ', analytics_storage ' + esc( cs.analytics_storage || '—' ) + ', ad_personalization ' + esc( cs.ad_personalization || '—' ) : '<span class="s-consent">sconosciuto</span> <small>' + esc( cs.reason ) + '</small>' ) + '</div>' +
+			'<div>Consenso (' + esc( C.consent ) + ( cs.via ? ', ' + esc( cs.via ) : '' ) + '): ' + ( cs.ready ? 'ad_user_data <b>' + esc( cs.ad_user_data || '—' ) + '</b>, ad_storage ' + esc( cs.ad_storage || '—' ) + ', analytics_storage ' + esc( cs.analytics_storage || '—' ) + ', ad_personalization ' + esc( cs.ad_personalization || '—' ) : '<span class="s-consent">sconosciuto</span> <small>' + esc( cs.reason ) + '</small>' ) + '</div>' +
 			'<div>Libreria telefoni: <span data-lib>' + esc( libState ) + '</span> · Web Crypto: ' + ( K.hasSubtle() ? 'sì' : '<span class="x">no (serve HTTPS)</span>' ) + '</div>' +
 			'<h4 style="margin-top:8px">Form nella pagina</h4><ul data-forms></ul><h4>Eventi</h4><ul data-events><li>Invia un form o clicca un contatto.</li></ul>';
 		box.querySelector( '[data-close]' ).addEventListener( 'click', function () {

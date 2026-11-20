@@ -31,6 +31,7 @@ lu3g-conversion-tracker/
 ├─ gtm/
 │  ├─ lu3g-conversion-tracker-container.json  container generico (ID da sostituire)
 │  ├─ lu3g-ct-bridge.tpl        modello di tag "LU3G CT Bridge" (diagnostica)
+│  ├─ lu3g-ct-consent.tpl       modello di tag "LU3G CT Consent" (ponte del consenso, 1.1.0)
 │  └─ README.md                 configurazione manuale equivalente
 └─ tests/core.test.js           test automatici (node tests/core.test.js)
 ```
@@ -123,7 +124,8 @@ form, il paese del sito (IT).
 `sha256_phone_number`. Senza Web Crypto (sito non HTTPS) gli identificatori si omettono: non si ripiega mai sull'invio in
 chiaro.
 
-**Consenso.** Adapter: `consent_mode` (comandi `gtag('consent', …)` nel dataLayer, serve un `update` esplicito del CMP),
+**Consenso.** Adapter: `consent_mode` (stato scritto dal ponte GTM dopo un evento del CMP, oppure comandi
+`gtag('consent', …)` nel dataLayer con un `update` esplicito del CMP),
 `iubenda` (come il precedente, più la presenza di `_iub.cs.api`), `custom` (`window.lu3gCTConsent()` restituisce
 `{ready, analytics_storage, ad_storage, ad_user_data, ad_personalization}`), `none`.
 - Gli identificatori servono solo ad Ads e richiedono `ad_user_data` esplicitamente `granted`. Il consenso si controlla
@@ -132,6 +134,12 @@ chiaro.
 - Il plugin non concede consensi, non mostra banner, non sovrascrive callback.
 - Per Iubenda: l'API JavaScript della Cookie Solution non espone lo stato per finalità quando il consenso è per finalità,
   quindi si leggono i segnali Consent Mode che Iubenda invia (in Iubenda va attivato Google Consent Mode).
+- **Ponte del consenso (1.1.0).** Se il CMP gestisce Consent Mode dentro GTM, il tag "LU3G - Ponte consenso" si
+  attiva sugli eventi del CMP (Iubenda: regex `^iubenda_`). Esempio: Iubenda con `googleConsentMode: "template"`, che non
+  scrive comandi consent nel dataLayer.
+  - Il tag legge i quattro segnali con `isConsentGranted` e li scrive in `window.lu3gCTConsentGTM`.
+  - Siccome parte solo dopo un evento del CMP, uno stato non impostato non viene preso per un consenso. È il "bridge GTM
+    esplicito" chiesto dalle specifiche.
 - Gli eventi senza identificatori partono sempre: cosa fanno i tag lo decide GTM con Consent Mode.
 
 **GA4.** Riceve solo metadati ordinari (niente email, telefono o hash; `page_location` senza query string). La funzione

@@ -1,5 +1,18 @@
 # Registro delle modifiche
 
+## 1.1.0
+- **Ponte del consenso** per i CMP che gestiscono Consent Mode dentro GTM (es. Iubenda con `googleConsentMode: "template"`,
+  trovato su un sito reale): in questo caso nel dataLayer non c'è nessun comando `gtag('consent', …)` e il plugin
+  considerava il consenso sconosciuto, quindi non inviava mai gli identificatori.
+  - Nuovo modello GTM "LU3G CT Consent" (`gtm/lu3g-ct-consent.tpl`), incluso nel JSON con il tag "LU3G - Ponte consenso".
+    Sugli eventi del CMP (Iubenda: `^iubenda_`, impostabile nella scheda Consenso) legge con `isConsentGranted` i quattro
+    segnali e li scrive in `window.lu3gCTConsentGTM`.
+  - Si attiva solo dopo un evento del CMP: uno stato "non impostato", che `isConsentGranted` considera concesso, non
+    viene mai preso per un consenso.
+  - Gli adapter "Consent Mode" e "Iubenda" usano questo stato quando c'è, altrimenti i comandi consent nel dataLayer.
+    La diagnostica mostra da dove arriva il consenso.
+- Pannello → GTM: download anche del modello del ponte.
+
 ## 1.0.0
 Prima versione.
 - **Form di Elementor Pro** (widget Form classico): evento `lead_submit` (o uno alternativo per form, es.

@@ -20,6 +20,7 @@ final class LU3G_CT_Admin {
 		add_action( 'wp_ajax_lu3g_ct', array( __CLASS__, 'ajax' ) );
 		add_action( 'admin_post_lu3g_ct_gtm', array( __CLASS__, 'download_gtm' ) );
 		add_action( 'admin_post_lu3g_ct_tpl', array( __CLASS__, 'download_tpl' ) );
+		add_action( 'admin_post_lu3g_ct_tpl_consent', array( __CLASS__, 'download_tpl_consent' ) );
 		add_action( 'admin_post_lu3g_ct_report', array( __CLASS__, 'download_report' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'notice' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( LU3G_CT_FILE ), array( __CLASS__, 'action_links' ) );
@@ -338,8 +339,8 @@ final class LU3G_CT_Admin {
 
 	private static function tab_consent( array $g ) {
 		$opts = array(
-			'consent_mode' => array( __( 'Consent Mode v2 (qualsiasi CMP)', 'lu3g-conversion-tracker' ), __( 'Legge i comandi gtag(\'consent\', \'default\'/\'update\', …) che il CMP mette nel dataLayer. Serve un "update" esplicito: il solo stato predefinito vale come sconosciuto.', 'lu3g-conversion-tracker' ) ),
-			'iubenda'      => array( 'Iubenda', __( 'Come sopra, più la presenza della Cookie Solution (_iub.cs.api). In Iubenda attiva Google Consent Mode: l\'API JavaScript di Iubenda non espone lo stato per finalità quando il consenso è per finalità, quindi si leggono i segnali che Iubenda invia a Google.', 'lu3g-conversion-tracker' ) ),
+			'consent_mode' => array( __( 'Consent Mode v2 (qualsiasi CMP)', 'lu3g-conversion-tracker' ), __( 'Legge lo stato scritto dal tag "LU3G - Ponte consenso" di GTM dopo un evento del CMP (per i CMP che lavorano dentro GTM, come il modello Iubenda), oppure i comandi gtag(\'consent\', \'update\', …) che il CMP mette nel dataLayer. Il solo stato predefinito vale come sconosciuto.', 'lu3g-conversion-tracker' ) ),
+			'iubenda'      => array( 'Iubenda', __( 'Come sopra, più la presenza della Cookie Solution (_iub.cs.api). Con il modello Iubenda in GTM (googleConsentMode "template") lo stato arriva dal tag "LU3G - Ponte consenso" sugli eventi iubenda_*. L\'API JavaScript di Iubenda non espone lo stato per finalità, quindi si leggono i segnali che Iubenda passa a Google.', 'lu3g-conversion-tracker' ) ),
 			'custom'       => array( __( 'Adapter personalizzato', 'lu3g-conversion-tracker' ), __( 'Per altri CMP: una funzione window.lu3gCTConsent che restituisce lo stato esplicito (vedi sotto).', 'lu3g-conversion-tracker' ) ),
 			'none'         => array( __( 'Nessuno', 'lu3g-conversion-tracker' ), __( 'Senza CMP non c\'è consenso: gli identificatori non vengono mai inviati. Gli eventi sì.', 'lu3g-conversion-tracker' ) ),
 		);
@@ -348,7 +349,9 @@ final class LU3G_CT_Admin {
 		foreach ( $opts as $v => $o ) {
 			printf( '<label class="ct-option"><input type="radio" name="consent" value="%1$s" %2$s><span><strong>%3$s</strong><small>%4$s</small></span></label>', esc_attr( $v ), checked( $g['consent'], $v, false ), esc_html( $o[0] ), esc_html( $o[1] ) );
 		}
-		echo '</div>';
+		echo '<div class="ct-grid" style="margin-top:12px">';
+		self::field( 'consent_events', __( 'Eventi del CMP in GTM (regex)', 'lu3g-conversion-tracker' ), $g['consent_events'], __( 'Attivatore del tag "LU3G - Ponte consenso" nel JSON. Iubenda: ^iubenda_. Dopo una modifica riscarica il JSON.', 'lu3g-conversion-tracker' ) );
+		echo '</div></div>';
 		self::savebar();
 		echo '</form>';
 		echo '<div class="ct-card"><h3>' . esc_html__( 'Adapter personalizzato', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Da mettere nel sito (es. snippet WPCode) e adattare al CMP. ready deve essere true solo quando il CMP ha caricato la scelta dell\'utente.', 'lu3g-conversion-tracker' ) . '</p>';
@@ -387,7 +390,7 @@ final class LU3G_CT_Admin {
 		}
 		/* translators: %s: elenco eventi */
 		echo '<p class="ct-help">' . esc_html( sprintf( __( 'Eventi dei form inclusi: %s; più %s.', 'lu3g-conversion-tracker' ), implode( ', ', $events ), $g['contact_event'] ) ) . '</p>';
-		echo '<div class="ct-inline"><a class="ct-btn ct-btn--primary" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica il container (JSON)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Solo il modello del bridge (.tpl)', 'lu3g-conversion-tracker' ) . '</a></div>';
+		echo '<div class="ct-inline"><a class="ct-btn ct-btn--primary" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica il container (JSON)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del bridge (.tpl)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl_consent' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del ponte consenso (.tpl)', 'lu3g-conversion-tracker' ) . '</a></div>';
 		echo '<ol class="ct-steps">';
 		$steps = array(
 			__( 'GTM → Amministrazione → Importa container → scegli il file → area di lavoro nuova (consigliato) → opzione "Unisci" → "Rinomina i tag, gli attivatori e le variabili in conflitto". Tutti gli elementi iniziano con "LU3G -".', 'lu3g-conversion-tracker' ),
@@ -599,6 +602,14 @@ final class LU3G_CT_Admin {
 		header( 'Content-Type: text/plain; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="lu3g-ct-bridge.tpl"' );
 		readfile( LU3G_CT_PATH . 'gtm/lu3g-ct-bridge.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		exit;
+	}
+
+	public static function download_tpl_consent() {
+		self::guard_download();
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="lu3g-ct-consent.tpl"' );
+		readfile( LU3G_CT_PATH . 'gtm/lu3g-ct-consent.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
 		exit;
 	}
 

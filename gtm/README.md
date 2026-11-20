@@ -50,6 +50,10 @@ Un evento alternativo va ad Ads solo se ha una sua chiave con etichetta: non att
   - Metadati: `lu3g_role` = `ads`.
   - Gli identificatori vanno solo a questo tag. Non impostarli come `user_data` globale nel Google tag condiviso.
 - **LU3G - Linker conversioni**: Tutte le pagine. Se il container ne ha già uno, non aggiungerlo.
+- **LU3G - Ponte consenso**: modello personalizzato `lu3g-ct-consent.tpl`. Attivatore "LU3G - eventi del CMP (ponte
+  consenso)": Evento personalizzato con regex `^iubenda_`, oppure gli eventi del tuo CMP. Serve quando il CMP gestisce
+  Consent Mode dentro GTM (es. modello Iubenda): scrive nella pagina lo stato dei quattro segnali e il plugin lo usa per
+  decidere se inviare gli identificatori.
 - **LU3G - Bridge diagnostico**: modello personalizzato `lu3g-ct-bridge.tpl` (Modelli → Nuovo → menu ⋮ → Importa),
   attivatore "tutti gli eventi (bridge diagnostico)".
 
