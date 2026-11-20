@@ -115,6 +115,22 @@ async function t( name, fn ) {
 	await t( 'dominio falso', () => assert.strictEqual( L( 'https://wa.me.example.com/39333' ), null ) );
 	await t( 'pagina normale', () => assert.strictEqual( L( 'https://example.com/contatti' ), null ) );
 
+	/* canali personalizzati */
+	const R = ( type, pattern, href ) => core.matchRule( { type, pattern }, href );
+	const maps = 'maps.google.com, google.com/maps, maps.app.goo.gl, goo.gl/maps, maps.apple.com';
+	await t( 'maps: google.com/maps', () => assert.ok( R( 'url', maps, 'https://www.google.com/maps/dir/?api=1&destination=Milano' ) ) );
+	await t( 'maps: maps.app.goo.gl', () => assert.ok( R( 'url', maps, 'https://maps.app.goo.gl/AbCdE' ) ) );
+	await t( 'maps: google.com senza /maps no', () => assert.ok( ! R( 'url', maps, 'https://www.google.com/search?q=maps' ) ) );
+	await t( 'maps: dominio finto no', () => assert.ok( ! R( 'url', maps, 'https://maps.google.com.example.org/x' ) ) );
+	await t( 'telegram t.me', () => assert.ok( R( 'url', 't.me, telegram.me, tg:', 'https://t.me/nozzedafavola' ) ) );
+	await t( 'telegram schema tg:', () => assert.ok( R( 'url', 't.me, telegram.me, tg:', 'tg://resolve?domain=x' ) ) );
+	await t( 'messenger m.me', () => assert.ok( R( 'url', 'm.me, messenger.com', 'https://m.me/pagina' ) ) );
+	await t( 'sottodominio', () => assert.ok( R( 'url', 'calendly.com', 'https://it.calendly.com/studio/30min' ) ) );
+	await t( 'pdf', () => assert.ok( R( 'ext', 'pdf', 'https://example.com/wp-content/uploads/catalogo.PDF?v=2' ) ) );
+	await t( 'pdf no html', () => assert.ok( ! R( 'ext', 'pdf, zip', 'https://example.com/catalogo-pdf/' ) ) );
+	await t( 'regola vuota', () => assert.ok( ! R( 'url', '', 'https://t.me/x' ) ) );
+	await t( 'channelId', () => assert.strictEqual( core.channelId( 'Indicazioni (Google Maps)' ), 'indicazioni_google_maps' ) );
+
 	/* varie */
 	await t( 'percorso senza query', () => assert.strictEqual( core.cleanPath( '/grazie/?nome=Mario#x' ), '/grazie/' ) );
 	await t( 'uuid', () => assert.match( core.uuid(), /^[0-9a-f-]{36}$/ ) );

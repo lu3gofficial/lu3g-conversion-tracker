@@ -50,6 +50,12 @@ final class LU3G_CT_Settings {
 			'value_whatsapp'  => '',
 			'value_phone'     => '',
 			'value_email'     => '',
+			// Canali personalizzati (1.2.0): [ id, label, type url|ext|selector, pattern, on, key, value ]
+			'channels'        => self::channel_presets(),
+			// Meta (1.2.0): tag Lead / Contact nel JSON per GTM
+			'meta_pixel_id'   => '',
+			'meta_base'       => true,         // includi il tag base del pixel (con consenso)
+			'has_linker'      => false,        // il container ha già un Linker conversioni
 			// Configurazione GTM da scaricare
 			'gtm_ga4_id'      => '',
 			'gtm_ads_id'      => '',
@@ -57,12 +63,35 @@ final class LU3G_CT_Settings {
 		);
 	}
 
+	/** Canali pronti, spenti finché non li accendi. */
+	public static function channel_presets() {
+		return array(
+			array( 'id' => 'maps', 'label' => 'Indicazioni (Google Maps)', 'type' => 'url', 'pattern' => 'maps.google.com, google.com/maps, maps.app.goo.gl, goo.gl/maps, maps.apple.com', 'on' => false, 'key' => 'contact_maps', 'value' => '' ),
+			array( 'id' => 'telegram', 'label' => 'Telegram', 'type' => 'url', 'pattern' => 't.me, telegram.me, tg:', 'on' => false, 'key' => 'contact_telegram', 'value' => '' ),
+			array( 'id' => 'messenger', 'label' => 'Messenger', 'type' => 'url', 'pattern' => 'm.me, messenger.com', 'on' => false, 'key' => 'contact_messenger', 'value' => '' ),
+			array( 'id' => 'download', 'label' => 'Download PDF', 'type' => 'ext', 'pattern' => 'pdf', 'on' => false, 'key' => '', 'value' => '' ),
+		);
+	}
+
+	/** Canali accesi, ripuliti (per lo script e per il JSON GTM). */
+	public static function active_channels() {
+		return array_values(
+			array_filter(
+				self::get()['channels'],
+				function ( $c ) {
+					return ! empty( $c['on'] ) && '' !== $c['pattern'];
+				}
+			)
+		);
+	}
+
 	public static function get() {
 		$s = get_option( self::OPTION, array() );
 		$s = array_merge( self::defaults(), is_array( $s ) ? array_intersect_key( $s, self::defaults() ) : array() );
-		foreach ( array( 'forms_enabled', 'ec', 'test_mode', 'admins_test', 'contacts', 'ch_whatsapp', 'ch_phone', 'ch_email' ) as $k ) {
+		foreach ( array( 'forms_enabled', 'ec', 'test_mode', 'admins_test', 'contacts', 'ch_whatsapp', 'ch_phone', 'ch_email', 'meta_base', 'has_linker' ) as $k ) {
 			$s[ $k ] = (bool) $s[ $k ];
 		}
+		$s['channels'] = is_array( $s['channels'] ) ? array_values( $s['channels'] ) : self::channel_presets();
 		$s['gtm_labels'] = is_array( $s['gtm_labels'] ) ? $s['gtm_labels'] : array();
 		return $s;
 	}
@@ -73,7 +102,7 @@ final class LU3G_CT_Settings {
 	public static function save( array $in ) {
 		$cur    = self::get();
 		$errors = array();
-		foreach ( array( 'forms_enabled', 'ec', 'test_mode', 'admins_test', 'contacts', 'ch_whatsapp', 'ch_phone', 'ch_email' ) as $k ) {
+		foreach ( array( 'forms_enabled', 'ec', 'test_mode', 'admins_test', 'contacts', 'ch_whatsapp', 'ch_phone', 'ch_email', 'meta_base', 'has_linker' ) as $k ) {
 			if ( array_key_exists( $k, $in ) ) {
 				$cur[ $k ] = filter_var( $in[ $k ], FILTER_VALIDATE_BOOLEAN );
 			}
@@ -140,6 +169,62 @@ final class LU3G_CT_Settings {
 				$errors['consent_events'] = __( 'Espressione regolare non valida (es. ^iubenda_).', 'lu3g-conversion-tracker' );
 			} else {
 				$cur['consent_events'] = $v;
+			}
+		}
+		if ( array_key_exists( 'channels', $in ) && is_array( $in['channels'] ) ) {
+			$rows = array();
+			$seen = array( 'whatsapp' => 1, 'phone' => 1, 'email' => 1 );
+			foreach ( $in['channels'] as $i => $c ) {
+				if ( ! is_array( $c ) ) {
+					continue;
+				}
+				$label   = substr( sanitize_text_field( (string) ( $c['label'] ?? '' ) ), 0, 60 );
+				$pattern = substr( sanitize_text_field( (string) ( $c['pattern'] ?? '' ) ), 0, 400 );
+				if ( '' === $label && '' === $pattern ) {
+					continue; // riga vuota: tolta
+				}
+				$type = in_array( $c['type'] ?? '', array( 'url', 'ext', 'selector' ), true ) ? $c['type'] : 'url';
+				$id   = LU3G_CT_Settings::label( '' !== ( $c['id'] ?? '' ) ? $c['id'] : $label );
+				$base = $id;
+				$n    = 2;
+				while ( isset( $seen[ $id ] ) ) {
+					$id = $base . '_' . $n++;
+				}
+				$seen[ $id ] = 1;
+				$v           = LU3G_CT_Validate::value( $c['value'] ?? '' );
+				if ( ! $v['ok'] ) {
+					$errors[ 'channels[' . $i . '][value]' ] = $v['error'];
+				}
+				if ( '' === $label || '' === $pattern ) {
+					$errors[ 'channels[' . $i . '][' . ( '' === $label ? 'label' : 'pattern' ) . ']' ] = __( 'Nome e regola sono obbligatori.', 'lu3g-conversion-tracker' );
+				}
+				$rows[] = array(
+					'id'      => substr( $id, 0, 40 ),
+					'label'   => '' !== $label ? $label : $id,
+					'type'    => $type,
+					'pattern' => $pattern,
+					'on'      => ! empty( $c['on'] ) && filter_var( $c['on'], FILTER_VALIDATE_BOOLEAN ),
+					'key'     => LU3G_CT_Validate::conversion_key( $c['key'] ?? '' ),
+					'value'   => $v['ok'] && null !== $v['value'] ? (string) $v['value'] : '',
+				);
+			}
+			// Con un errore in una riga non si salva nessun canale: il pannello mostra l'errore e la lista resta com'era.
+			$channel_errors = array_filter(
+				array_keys( $errors ),
+				function ( $k ) {
+					return 0 === strpos( $k, 'channels[' );
+				}
+			);
+			if ( ! $channel_errors ) {
+				$cur['channels'] = $rows;
+			}
+		}
+		if ( array_key_exists( 'meta_pixel_id', $in ) ) {
+			$v = preg_replace( '/\D/', '', (string) $in['meta_pixel_id'] );
+			if ( '' !== trim( (string) $in['meta_pixel_id'] ) && ! preg_match( '/^\d{10,20}$/', $v ) ) {
+				$errors['meta_pixel_id'] = __( 'ID pixel Meta non valido (solo cifre, es. 984134627338848).', 'lu3g-conversion-tracker' );
+			} else {
+				$cur['meta_pixel_id'] = $v;
 			}
 		}
 		if ( array_key_exists( 'contact_exclude', $in ) ) {

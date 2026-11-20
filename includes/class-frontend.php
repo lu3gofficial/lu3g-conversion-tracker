@@ -132,6 +132,19 @@ final class LU3G_CT_Frontend {
 					'email'    => array( 'on' => $g['ch_email'], 'k' => $g['key_email'], 'v' => $values['email'] ),
 				),
 				'c'       => $g['currency'],
+				'custom'  => array_map(
+					function ( $c ) {
+						$v = LU3G_CT_Validate::value( $c['value'] );
+						return array(
+							'id' => $c['id'],
+							't'  => $c['type'],
+							'p'  => $c['pattern'],
+							'k'  => $c['key'],
+							'v'  => $v['value'],
+						);
+					},
+					LU3G_CT_Settings::active_channels()
+				),
 			),
 		);
 		if ( $diag ) {

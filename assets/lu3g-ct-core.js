@@ -11,6 +11,9 @@
  * - sha256Hex: SHA-256 di UTF-8, esadecimale minuscolo (Web Crypto). Senza Web Crypto restituisce null: niente ripieghi.
  * - validateEventName, parseValue, isCurrency: le stesse regole del PHP (includes/class-validate.php).
  * - classifyContactLink: tel:, mailto:, link WhatsApp click-to-chat (host e percorso, non la parola "whatsapp").
+ * - matchRule (1.2.0): canali personalizzati. Tipo "url": domini, domini con percorso o schemi (es. maps.google.com,
+ *   google.com/maps, t.me, tg:); tipo "ext": estensioni di file (pdf, zip). Il tipo "selector" (classe CSS) lo controlla
+ *   tracker.js sull'elemento cliccato.
  */
 ( function ( root, factory ) {
 	var api = factory();
@@ -272,6 +275,80 @@
 		return null;
 	}
 
+	/* ------------------------------------------------------------------ canali personalizzati */
+
+	function patterns( list ) {
+		return String( list || '' ).split( /[\n,]+/ ).map( function ( x ) {
+			return x.trim().toLowerCase();
+		} ).filter( Boolean );
+	}
+
+	/**
+	 * Il link corrisponde alla regola? rule = { type: 'url' | 'ext', pattern: 'a, b, c' }.
+	 * url: "schema:" confronta l'inizio dell'indirizzo; "dominio" o "dominio/percorso" confronta host (anche i
+	 *      sottodomini) e inizio del percorso, senza www. Mai una ricerca libera nel testo dell'indirizzo.
+	 * ext: estensione del file nel percorso (senza query string).
+	 */
+	function matchRule( rule, href ) {
+		if ( ! rule || typeof href !== 'string' || href.trim() === '' ) {
+			return false;
+		}
+		var h = href.trim();
+		var list = patterns( rule.pattern );
+		if ( ! list.length ) {
+			return false;
+		}
+		var u = null;
+		try {
+			u = new URL( h, typeof location !== 'undefined' ? location.href : 'https://example.invalid/' );
+		} catch ( e ) {
+			u = null;
+		}
+		if ( rule.type === 'ext' ) {
+			if ( ! u ) {
+				return false;
+			}
+			var m = /\.([a-z0-9]{1,8})$/i.exec( u.pathname );
+			return !! m && list.map( function ( x ) {
+				return x.replace( /^\./, '' );
+			} ).indexOf( m[ 1 ].toLowerCase() ) !== -1;
+		}
+		if ( rule.type !== 'url' ) {
+			return false;
+		}
+		var lower = h.toLowerCase();
+		for ( var i = 0; i < list.length; i++ ) {
+			var p = list[ i ];
+			if ( /^[a-z][a-z0-9+.\-]*:$/.test( p ) ) {
+				if ( lower.indexOf( p ) === 0 ) {
+					return true;
+				}
+				continue;
+			}
+			if ( ! u || ( u.protocol !== 'https:' && u.protocol !== 'http:' ) ) {
+				continue;
+			}
+			var host = u.hostname.toLowerCase().replace( /^www\./, '' );
+			var slash = p.indexOf( '/' );
+			var ph = ( slash === -1 ? p : p.slice( 0, slash ) ).replace( /^www\./, '' );
+			var pp = slash === -1 ? '' : p.slice( slash );
+			var hostOk = host === ph || host.slice( -( ph.length + 1 ) ) === '.' + ph;
+			if ( hostOk && ( pp === '' || u.pathname.toLowerCase().indexOf( pp ) === 0 ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Identificatore di un canale: minuscole, numeri, trattino basso. */
+	function channelId( text ) {
+		var t = String( text || '' ).toLowerCase();
+		if ( t.normalize ) {
+			t = t.normalize( 'NFD' ).replace( /[\u0300-\u036f]/g, '' );
+		}
+		return t.replace( /[^a-z0-9]+/g, '_' ).replace( /^_+|_+$/g, '' ).slice( 0, 40 );
+	}
+
 	/* ------------------------------------------------------------------ percorso pulito */
 
 	/** Solo il percorso, senza query string né frammento (possono contenere dati compilati). */
@@ -311,6 +388,8 @@
 		parseValue: parseValue,
 		isCurrency: isCurrency,
 		classifyContactLink: classifyContactLink,
+		matchRule: matchRule,
+		channelId: channelId,
 		cleanPath: cleanPath,
 		uuid: uuid
 	};

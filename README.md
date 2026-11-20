@@ -86,6 +86,17 @@ Evento contatto:
   Gli oggetti restano comunque nell'array del dataLayer fino al cambio pagina: il reset non li cancella e gli hash non
   sono dati anonimi. Niente cookie, localStorage, sessionStorage o log con contatti o hash.
 
+## Canali personalizzati (1.2.0)
+Scheda **Canali**: WhatsApp, telefono ed email sono sempre pronti. In più, regole con nome, chiave Ads e valore.
+Una regola riconosce il link in uno di tre modi:
+- **Indirizzo**: domini (`calendly.com`, vale anche per i sottodomini), domini con percorso (`google.com/maps`) o schemi
+  (`tg:`).
+- **Tipo di file**: `pdf, zip`.
+- **Classe CSS**: `.btn-prenota`, vale anche per un pulsante senza link.
+
+Ordine di controllo: prima le classi CSS (le più specifiche), poi WhatsApp/telefono/email, poi le altre regole.
+Pronti da accendere: Google Maps, Messenger, Telegram, Download PDF. Il canale arriva in `lu3g.contact_type`.
+
 ## Decisioni
 
 **Invio riuscito.** Vale il successo che Elementor restituisce al browser: l'evento jQuery `submit_success` (Elementor lo
@@ -141,6 +152,11 @@ chiaro.
   - Siccome parte solo dopo un evento del CMP, uno stato non impostato non viene preso per un consenso. È il "bridge GTM
     esplicito" chiesto dalle specifiche.
 - Gli eventi senza identificatori partono sempre: cosa fanno i tag lo decide GTM con Consent Mode.
+
+**Meta (file per GTM, 1.2.0).** Con l'ID del pixel il file contiene il pixel base (facoltativo), `Lead` sui form e
+`Contact` sui click, con `eventID` = `event_id` per la futura deduplica con la Conversions API. I tag partono solo con il
+consenso `ad_storage`. Il pixel base parte anche sugli eventi del banner: GTM non riprova da solo un tag bloccato quando
+il consenso arriva dopo. Nessun dato personale a Meta: niente advanced matching in chiaro.
 
 **GA4.** Riceve solo metadati ordinari (niente email, telefono o hash; `page_location` senza query string). La funzione
 GA4 "User-provided data" richiede un'integrazione separata e non è attiva. `lead_submit` resta il nome: mapparlo su

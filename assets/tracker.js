@@ -537,18 +537,51 @@
 			return;
 		}
 		e.__lu3gCT = true;
-		var a = e.target && e.target.closest ? e.target.closest( 'a[href]' ) : null;
+		var el = e.target && e.target.closest ? e.target : null;
+		if ( ! el ) {
+			return;
+		}
+		var a = el.closest( 'a[href]' );
+		var custom = C.contacts.custom || [];
+		var ch = null;
+		var kind = null;
+		// 1) canali personalizzati con classe CSS (i più specifici, anche pulsanti senza link),
+		// 2) WhatsApp / telefono / email, 3) altri personalizzati (domini, estensioni).
+		for ( var i = 0; i < custom.length && ! ch; i++ ) {
+			if ( custom[ i ].t === 'selector' ) {
+				try {
+					var hit = el.closest( custom[ i ].p );
+					if ( hit ) {
+						ch = custom[ i ];
+						a = a || hit;
+					}
+				} catch ( err ) {
+					// selettore non valido: ignorato
+				}
+			}
+		}
 		if ( ! a || excluded( a ) ) {
 			return;
 		}
-		var kind = K.classifyContactLink( a.getAttribute( 'href' ) );
-		if ( ! kind ) {
+		var href = a.getAttribute( 'href' ) || '';
+		if ( ! ch ) {
+			kind = K.classifyContactLink( href );
+			if ( kind ) {
+				ch = C.contacts.ch[ kind.type ];
+				if ( ! ch || ! ch.on ) {
+					return;
+				}
+			}
+		}
+		for ( var j = 0; j < custom.length && ! ch; j++ ) {
+			if ( custom[ j ].t !== 'selector' && K.matchRule( { type: custom[ j ].t, pattern: custom[ j ].p }, href ) ) {
+				ch = custom[ j ];
+			}
+		}
+		if ( ! ch ) {
 			return;
 		}
-		var ch = C.contacts.ch[ kind.type ];
-		if ( ! ch || ! ch.on ) {
-			return;
-		}
+		kind = kind || { type: ch.id };
 		var lu3g = {
 			schema_version: K.SCHEMA_VERSION,
 			event_id: K.uuid(),
@@ -817,7 +850,7 @@
 			r.steps.gtm = { state: expected ? 'error' : 'ok', note: 'evento elaborato dal container ' + r.gtm_container + ( expected ? ' (atteso ' + C.gtm + ')' : '' ) };
 			var tags = Array.isArray( p.tags ) ? p.tags : [];
 			var relevant = tags.filter( function ( t ) {
-				return t && ( t.role === 'ga4' || t.role === 'ads' );
+				return t && ( t.role === 'ga4' || t.role === 'ads' || t.role === 'meta' );
 			} );
 			if ( relevant.length ) {
 				var bad = relevant.filter( function ( t ) {
@@ -827,7 +860,7 @@
 					return ( t.name || t.role ) + ': ' + t.status;
 				} ).join( ' · ' ) };
 			} else {
-				r.steps.tags = { state: 'unverified', note: tags.length ? 'nessun tag con ruolo ga4/ads nei metadati' : 'nessun tag eseguito per questo evento' };
+				r.steps.tags = { state: 'unverified', note: tags.length ? 'nessun tag con ruolo ga4/ads/meta nei metadati' : 'nessun tag eseguito per questo evento' };
 			}
 			render( r );
 			send( r );

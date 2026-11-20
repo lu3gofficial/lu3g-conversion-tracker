@@ -1,5 +1,24 @@
 # Registro delle modifiche
 
+## 1.2.0
+- **Canali personalizzati** (scheda Canali, prima "Contatti"): oltre a WhatsApp, telefono ed email, regole tue con nome,
+  "riconosci dal" (indirizzo del link: domini, domini con percorso o schemi; tipo di file; classe CSS di un pulsante,
+  anche senza link), chiave Ads e valore. Pronti da accendere: Indicazioni (Google Maps), Messenger, Telegram, Download
+  PDF. Il canale arriva in `contact_type` (es. `maps`, `download`, `prenotazioni`). Mai una ricerca libera nel testo
+  dell'indirizzo: dominio e inizio del percorso.
+- **Pannello semplificato**: Impostazioni con solo le cose di base (form sì/no, nome evento, conversioni avanzate,
+  banner dei cookie); valore, valuta, paese, chiavi, container, test e adapter personalizzato nella sezione "Avanzate".
+  La scheda Consenso è unita a Impostazioni. Nella scheda Form e nel widget di Elementor in vista solo "Traccia questo
+  form" e il nome evento; il resto dietro "Avanzate" / "Opzioni avanzate" (i valori già salvati restano validi).
+- **Valore delle conversioni**: spiegato che per un sito di contatti di solito resta vuoto (si conta il lead; il "una
+  per persona" si imposta in Google Ads con Conteggio: Una). Senza valore non partono né valore né valuta.
+- **Meta nel file per GTM**: con l'ID del pixel il file contiene "LU3G - Meta - Pixel base" (facoltativo), "Lead" sui form
+  e "Contact" sui click, con `eventID` = `event_id`, solo con il consenso `ad_storage`. Il pixel base parte anche
+  sull'evento del banner, così se il visitatore accetta dopo il caricamento della pagina il pixel si attiva allora.
+- **Linker conversioni** facoltativo nel file ("Il container ha già il Linker conversioni"). Le chiavi dei canali
+  personalizzati entrano nella tabella delle etichette Ads.
+- Correzione: una riga di canale incompleta non viene più salvata (prima il pannello mostrava l'errore ma la salvava).
+
 ## 1.1.0
 - **Ponte del consenso** per i CMP che gestiscono Consent Mode dentro GTM (es. Iubenda con `googleConsentMode: "template"`,
   trovato su un sito reale): in questo caso nel dataLayer non c'è nessun comando `gtag('consent', …)` e il plugin

@@ -44,13 +44,13 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_tracking',
 			array(
-				'label'   => __( 'Tracking del form', 'lu3g-conversion-tracker' ),
+				'label'   => __( 'Traccia questo form', 'lu3g-conversion-tracker' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
 				'options' => array(
-					''    => $inherit . ' (' . ( $g['forms_enabled'] ? __( 'attivo', 'lu3g-conversion-tracker' ) : __( 'disattivo', 'lu3g-conversion-tracker' ) ) . ')',
-					'on'  => __( 'Attivo', 'lu3g-conversion-tracker' ),
-					'off' => __( 'Disattivo', 'lu3g-conversion-tracker' ),
+					''    => $inherit . ' (' . ( $g['forms_enabled'] ? __( 'sì', 'lu3g-conversion-tracker' ) : __( 'no', 'lu3g-conversion-tracker' ) ) . ')',
+					'on'  => __( 'Sì', 'lu3g-conversion-tracker' ),
+					'off' => __( 'No', 'lu3g-conversion-tracker' ),
 				),
 			)
 		);
@@ -67,8 +67,21 @@ final class LU3G_CT_Elementor {
 		);
 
 		$widget->add_control(
+			'lu3g_ct_more',
+			array(
+				'label'        => __( 'Opzioni avanzate', 'lu3g-conversion-tracker' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'separator'    => 'before',
+				'description'  => __( 'Campi email/telefono, valore, Google Ads. Di solito non servono.', 'lu3g-conversion-tracker' ),
+			)
+		);
+
+		$widget->add_control(
 			'lu3g_ct_label',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Nome descrittivo', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => 'richiesta_preventivo',
@@ -80,6 +93,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_value_mode',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'     => __( 'Valore', 'lu3g-conversion-tracker' ),
 				'type'      => \Elementor\Controls_Manager::SELECT,
 				'default'   => '',
@@ -99,7 +113,7 @@ final class LU3G_CT_Elementor {
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => '25,50',
 				'description' => __( 'Numero non negativo, anche 0; virgola o punto.', 'lu3g-conversion-tracker' ),
-				'condition'   => array( 'lu3g_ct_value_mode' => 'fixed' ),
+				'condition'   => array( 'lu3g_ct_more' => 'yes', 'lu3g_ct_value_mode' => 'fixed' ),
 				'ai'          => array( 'active' => false ),
 			)
 		);
@@ -107,6 +121,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_currency',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Valuta', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => $g['currency'],
@@ -118,6 +133,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_email_field',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Campo email (ID)', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => __( 'automatico', 'lu3g-conversion-tracker' ),
@@ -130,6 +146,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_phone_field',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Campo telefono (ID)', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => __( 'automatico', 'lu3g-conversion-tracker' ),
@@ -140,6 +157,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_country_field',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Campo paese (ID)', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'description' => __( 'Facoltativo: un campo con il paese (IT, CH… o +39) usato per i numeri scritti senza prefisso.', 'lu3g-conversion-tracker' ),
@@ -150,6 +168,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_country',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'       => __( 'Paese del telefono', 'lu3g-conversion-tracker' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => $g['country'],
@@ -161,6 +180,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_ec',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'     => __( 'Conversioni avanzate', 'lu3g-conversion-tracker' ),
 				'type'      => \Elementor\Controls_Manager::SELECT,
 				'default'   => '',
@@ -176,6 +196,7 @@ final class LU3G_CT_Elementor {
 		$widget->add_control(
 			'lu3g_ct_ads',
 			array(
+				'condition' => array( 'lu3g_ct_more' => 'yes' ),
 				'label'   => __( 'Destinazione Google Ads', 'lu3g-conversion-tracker' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => '',
@@ -194,7 +215,7 @@ final class LU3G_CT_Elementor {
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => 'lead',
 				'description' => __( 'Nome logico (es. lead, preventivo) collegato in GTM a ID ed etichetta della conversione Ads.', 'lu3g-conversion-tracker' ),
-				'condition'   => array( 'lu3g_ct_ads' => 'key' ),
+				'condition'   => array( 'lu3g_ct_more' => 'yes', 'lu3g_ct_ads' => 'key' ),
 				'ai'          => array( 'active' => false ),
 			)
 		);

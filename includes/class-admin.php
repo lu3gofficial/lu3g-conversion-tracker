@@ -91,11 +91,11 @@ final class LU3G_CT_Admin {
 			'overview' => __( 'Panoramica', 'lu3g-conversion-tracker' ),
 			'settings' => __( 'Impostazioni', 'lu3g-conversion-tracker' ),
 			'forms'    => __( 'Form', 'lu3g-conversion-tracker' ),
-			'contacts' => __( 'Contatti', 'lu3g-conversion-tracker' ),
-			'consent'  => __( 'Consenso', 'lu3g-conversion-tracker' ),
+			'contacts' => __( 'Canali', 'lu3g-conversion-tracker' ),
 			'gtm'      => __( 'GTM', 'lu3g-conversion-tracker' ),
 			'diag'     => __( 'Diagnostica', 'lu3g-conversion-tracker' ),
 		);
+		$tab  = 'consent' === $tab ? 'settings' : $tab; // scheda Consenso unita a Impostazioni (1.2.0)
 		$tab  = isset( $tabs[ $tab ] ) ? $tab : 'overview';
 		$g    = LU3G_CT_Settings::get();
 		$forms = LU3G_CT_Forms::all();
@@ -198,24 +198,49 @@ final class LU3G_CT_Admin {
 	}
 
 	private static function tab_settings( array $g ) {
+		$consent = array(
+			'iubenda'      => __( 'Iubenda', 'lu3g-conversion-tracker' ),
+			'consent_mode' => __( 'Altro CMP con Consent Mode', 'lu3g-conversion-tracker' ),
+			'custom'       => __( 'Adapter personalizzato (sviluppatori)', 'lu3g-conversion-tracker' ),
+			'none'         => __( 'Nessun banner: mai email e telefono', 'lu3g-conversion-tracker' ),
+		);
 		echo '<form class="ct-form" data-save="settings" autocomplete="off">';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Form', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Valgono per tutti i form; ogni form può cambiarle nella sezione "Tracciamento LU3G" del widget o nella scheda Form.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
-		self::toggle( 'forms_enabled', __( 'Tracking dei form attivo', 'lu3g-conversion-tracker' ), $g['forms_enabled'], __( 'Anche sui form nuovi, senza toccarli.', 'lu3g-conversion-tracker' ) );
-		self::toggle( 'ec', __( 'Conversioni avanzate', 'lu3g-conversion-tracker' ), $g['ec'], __( 'Email e telefono cifrati, solo con il consenso ad_user_data.', 'lu3g-conversion-tracker' ) );
-		self::field( 'event', __( 'Nome evento', 'lu3g-conversion-tracker' ), $g['event'], __( 'Predefinito lead_submit. Se lo cambi, aggiorna anche GTM.', 'lu3g-conversion-tracker' ) );
-		self::field( 'conversion_key', __( 'Chiave conversione Ads', 'lu3g-conversion-tracker' ), $g['conversion_key'], __( 'Nome logico collegato in GTM a ID ed etichetta. Vuoto: nessuna conversione Ads.', 'lu3g-conversion-tracker' ) );
-		self::field( 'value', __( 'Valore', 'lu3g-conversion-tracker' ), $g['value'], __( 'Vuoto: nessun valore (non inventarne uno). 0 è un valore. Virgola o punto.', 'lu3g-conversion-tracker' ) );
-		self::field( 'currency', __( 'Valuta', 'lu3g-conversion-tracker' ), $g['currency'], __( 'ISO 4217, es. EUR.', 'lu3g-conversion-tracker' ) );
-		self::field( 'country', __( 'Paese dei telefoni', 'lu3g-conversion-tracker' ), $g['country'], __( 'Per i numeri scritti senza prefisso. Es. IT.', 'lu3g-conversion-tracker' ) );
+		echo '<div class="ct-card"><h3>' . esc_html__( 'Impostazioni di base', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Bastano queste. Ogni form si può spegnere o rinominare nella scheda Form o nel widget di Elementor.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
+		self::toggle( 'forms_enabled', __( 'Traccia gli invii dei form', 'lu3g-conversion-tracker' ), $g['forms_enabled'], __( 'Evento dopo ogni invio riuscito, anche sui form nuovi.', 'lu3g-conversion-tracker' ) );
+		self::field( 'event', __( 'Nome evento dei form', 'lu3g-conversion-tracker' ), $g['event'], __( 'Predefinito lead_submit. Se lo cambi, aggiorna anche GTM.', 'lu3g-conversion-tracker' ) );
+		self::toggle( 'ec', __( 'Conversioni avanzate', 'lu3g-conversion-tracker' ), $g['ec'], __( 'Email e telefono cifrati per Google Ads, solo se il visitatore accetta i cookie di marketing.', 'lu3g-conversion-tracker' ) );
+		echo '<label class="ct-field"><span>' . esc_html__( 'Banner dei cookie', 'lu3g-conversion-tracker' ) . '</span><select name="consent">';
+		foreach ( $consent as $v => $l ) {
+			echo '<option value="' . esc_attr( $v ) . '"' . selected( $g['consent'], $v, false ) . '>' . esc_html( $l ) . '</option>';
+		}
+		echo '</select><small class="ct-help">' . esc_html__( 'Da qui il plugin legge il consenso. Gli eventi partono sempre; email e telefono cifrati solo con il consenso.', 'lu3g-conversion-tracker' ) . '</small></label>';
 		echo '</div></div>';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Google Tag Manager', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Si usa il container già presente nel sito: il plugin non ne aggiunge un altro.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
+
+		echo '<details class="ct-card ct-advanced"><summary><h3>' . esc_html__( 'Avanzate', 'lu3g-conversion-tracker' ) . '</h3><span class="ct-help">' . esc_html__( 'Di solito non servono.', 'lu3g-conversion-tracker' ) . '</span></summary>';
+		echo '<h4>' . esc_html__( 'Valore delle conversioni', 'lu3g-conversion-tracker' ) . '</h4><p class="ct-help">' . esc_html__( 'Per un sito che raccoglie contatti di solito si lascia vuoto: si conta il lead, non un importo. Il "una per persona" si imposta in Google Ads (Conteggio: Una). Un valore serve solo per le offerte basate sul valore.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
+		self::field( 'value', __( 'Valore di un lead', 'lu3g-conversion-tracker' ), $g['value'], __( 'Vuoto: nessun valore. 0 è un valore. Virgola o punto.', 'lu3g-conversion-tracker' ) );
+		self::field( 'currency', __( 'Valuta', 'lu3g-conversion-tracker' ), $g['currency'], __( 'Usata solo se c\'è un valore. ISO 4217, es. EUR.', 'lu3g-conversion-tracker' ) );
+		echo '</div><h4>' . esc_html__( 'Google Ads e telefoni', 'lu3g-conversion-tracker' ) . '</h4><div class="ct-grid">';
+		self::field( 'conversion_key', __( 'Chiave conversione Ads dei form', 'lu3g-conversion-tracker' ), $g['conversion_key'], __( 'Nome logico collegato in GTM a ID ed etichetta. Vuoto: nessuna conversione Ads.', 'lu3g-conversion-tracker' ) );
+		self::field( 'country', __( 'Paese dei telefoni', 'lu3g-conversion-tracker' ), $g['country'], __( 'Per i numeri scritti senza prefisso. Es. IT.', 'lu3g-conversion-tracker' ) );
+		echo '</div><h4>' . esc_html__( 'Google Tag Manager', 'lu3g-conversion-tracker' ) . '</h4><div class="ct-grid">';
 		self::field( 'container_id', __( 'ID del container atteso', 'lu3g-conversion-tracker' ), $g['container_id'], __( 'GTM-XXXXXXX, solo per la diagnostica.', 'lu3g-conversion-tracker' ) );
 		self::field( 'datalayer', __( 'Nome del dataLayer', 'lu3g-conversion-tracker' ), $g['datalayer'], __( 'Predefinito dataLayer.', 'lu3g-conversion-tracker' ) );
-		echo '</div></div>';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Test', 'lu3g-conversion-tracker' ) . '</h3><div class="ct-grid">';
-		self::toggle( 'test_mode', __( 'Modalità di test', 'lu3g-conversion-tracker' ), $g['test_mode'], __( 'test_mode: true su tutti gli eventi. Da sola non esclude niente: in GTM gli attivatori LU3G filtrano test_mode = false.', 'lu3g-conversion-tracker' ) );
-		self::toggle( 'admins_test', __( 'Amministratori collegati come test', 'lu3g-conversion-tracker' ), $g['admins_test'], __( 'I tuoi invii da amministratore non contano come conversioni reali.', 'lu3g-conversion-tracker' ) );
-		echo '</div></div>';
+		self::field( 'consent_events', __( 'Eventi del banner in GTM (regex)', 'lu3g-conversion-tracker' ), $g['consent_events'], __( 'Attivatore del tag "LU3G - Ponte consenso". Iubenda: ^iubenda_.', 'lu3g-conversion-tracker' ) );
+		echo '</div><h4>' . esc_html__( 'Test', 'lu3g-conversion-tracker' ) . '</h4><div class="ct-grid">';
+		self::toggle( 'admins_test', __( 'Amministratori collegati come test', 'lu3g-conversion-tracker' ), $g['admins_test'], __( 'I tuoi invii da amministratore non diventano conversioni vere.', 'lu3g-conversion-tracker' ) );
+		self::toggle( 'test_mode', __( 'Tutto il sito in test', 'lu3g-conversion-tracker' ), $g['test_mode'], __( 'test_mode: true su tutti gli eventi: i tag LU3G di produzione non partono.', 'lu3g-conversion-tracker' ) );
+		echo '</div><h4>' . esc_html__( 'Adapter personalizzato del consenso', 'lu3g-conversion-tracker' ) . '</h4><p class="ct-help">' . esc_html__( 'Solo con "Adapter personalizzato": una funzione nel sito (es. snippet WPCode) che restituisce lo stato del CMP. ready = true solo quando il CMP ha caricato la scelta.', 'lu3g-conversion-tracker' ) . '</p>';
+		echo '<pre class="ct-code">window.lu3gCTConsent = function () {
+  var s = window.MioCMP &amp;&amp; window.MioCMP.getConsent ? window.MioCMP.getConsent() : null;
+  if (!s) { return { ready: false }; }
+  return { ready: true,
+    analytics_storage: s.statistiche ? \'granted\' : \'denied\',
+    ad_storage: s.marketing ? \'granted\' : \'denied\',
+    ad_user_data: s.marketing ? \'granted\' : \'denied\',
+    ad_personalization: s.marketing ? \'granted\' : \'denied\' };
+};</pre>';
+		echo '</details>';
 		self::savebar();
 		echo '</form>';
 	}
@@ -228,18 +253,13 @@ final class LU3G_CT_Admin {
 			echo '<p class="ct-empty">' . esc_html__( 'Nessun form di Elementor trovato.', 'lu3g-conversion-tracker' ) . '</p></div>';
 			return;
 		}
-		$o = array(
-			'form'   => __( 'del form', 'lu3g-conversion-tracker' ),
-			'global' => __( 'globale', 'lu3g-conversion-tracker' ),
-			'auto'   => __( 'automatico', 'lu3g-conversion-tracker' ),
-		);
 		echo '<div class="ct-forms">';
 		foreach ( $forms as $key => $f ) {
 			$e   = LU3G_CT_Settings::effective( $f );
 			$c   = $e['cfg'];
 			$sup = 'supported' === $f['adapter_status'];
 			$on  = $c['enabled'] && empty( $e['errors']['event'] );
-			echo '<details class="ct-formrow"><summary><span class="ct-dot ' . ( $on ? 'is-on' : '' ) . '" aria-hidden="true"></span><span class="ct-formrow__name"><strong>' . esc_html( $f['name'] ) . '</strong><small>' . esc_html( $f['post_title'] . ' · ' . $key ) . '</small></span>';
+			echo '<details class="ct-formrow"><summary><span class="ct-dot ' . ( $on ? 'is-on' : '' ) . '" aria-hidden="true"></span><span class="ct-formrow__name"><strong>' . esc_html( $f['name'] ) . '</strong><small>' . esc_html( $f['post_title'] ) . '</small></span>';
 			echo '<span class="ct-formrow__meta">' . ( $sup ? ( $on ? '<code>' . esc_html( $c['event'] ) . '</code>' : '<em>' . esc_html__( 'non tracciato', 'lu3g-conversion-tracker' ) . '</em>' ) : '<em>' . esc_html__( 'Atomic Form: non supportato', 'lu3g-conversion-tracker' ) . '</em>' ) . ( $e['errors'] ? ' <span class="ct-st ct-st--error">' . esc_html__( 'Da sistemare', 'lu3g-conversion-tracker' ) . '</span>' : '' ) . '</span></summary>';
 			echo '<div class="ct-formrow__body">';
 			if ( $e['errors'] ) {
@@ -253,28 +273,9 @@ final class LU3G_CT_Admin {
 				echo '<p class="ct-help">' . esc_html__( 'Atomic Form usa un ciclo di invio diverso dal widget classico: verrà supportato con un adapter dedicato e provato. Per ora non genera eventi.', 'lu3g-conversion-tracker' ) . '</p></div></details>';
 				continue;
 			}
-			// Configurazione effettiva con origine
-			$rows = array(
-				__( 'Tracking', 'lu3g-conversion-tracker' )         => array( $c['enabled'] ? __( 'attivo', 'lu3g-conversion-tracker' ) : __( 'disattivo', 'lu3g-conversion-tracker' ), $e['origin']['enabled'] ),
-				__( 'Evento', 'lu3g-conversion-tracker' )           => array( $c['event'], $e['origin']['event'] ),
-				__( 'form_name', 'lu3g-conversion-tracker' )        => array( $c['form_name'], $e['origin']['form_name'] ),
-				__( 'Valore', 'lu3g-conversion-tracker' )           => array( null === $c['value'] ? __( 'nessuno', 'lu3g-conversion-tracker' ) : $c['value'] . ' ' . $c['currency'], $e['origin']['value'] ),
-				__( 'Conversione Ads', 'lu3g-conversion-tracker' )  => array( '' !== $c['conversion_key'] ? $c['conversion_key'] : __( 'esclusa', 'lu3g-conversion-tracker' ), $e['origin']['conversion_key'] ),
-				__( 'Conv. avanzate', 'lu3g-conversion-tracker' )   => array( $c['ec'] ? __( 'sì (col consenso)', 'lu3g-conversion-tracker' ) : __( 'no', 'lu3g-conversion-tracker' ), $e['origin']['ec'] ),
-				__( 'Campo email', 'lu3g-conversion-tracker' )      => array( '' !== $c['email'] ? $c['email'] : '—', $e['origin']['email'] ),
-				__( 'Campo telefono', 'lu3g-conversion-tracker' )   => array( '' !== $c['phone'] ? $c['phone'] : '—', $e['origin']['phone'] ),
-				__( 'Paese telefono', 'lu3g-conversion-tracker' )   => array( $c['country'] . ( $c['country_field'] ? ' + ' . __( 'campo', 'lu3g-conversion-tracker' ) . ' ' . $c['country_field'] : '' ), $e['origin']['country'] ),
-			);
-			echo '<dl class="ct-eff">';
-			foreach ( $rows as $label => $r ) {
-				echo '<div><dt>' . esc_html( $label ) . '</dt><dd>' . esc_html( (string) $r[0] ) . ' <small>' . esc_html( $o[ $r[1] ] ?? $r[1] ) . '</small></dd></div>';
-			}
-			echo '</dl>';
-			$cand = $e['candidates'];
-			/* translators: 1: campi email, 2: campi telefono */
-			echo '<p class="ct-help">' . esc_html( sprintf( __( 'Candidati trovati — email: %1$s · telefono: %2$s', 'lu3g-conversion-tracker' ), $cand['email'] ? implode( ', ', $cand['email'] ) : '—', $cand['phone'] ? implode( ', ', $cand['phone'] ) : '—' ) ) . '</p>';
+			/* translators: 1: campo email, 2: campo telefono */
+			echo '<p class="ct-help">' . esc_html( sprintf( __( 'Email: %1$s · Telefono: %2$s · Conversione Ads: %3$s', 'lu3g-conversion-tracker' ), '' !== $c['email'] ? $c['email'] : '—', '' !== $c['phone'] ? $c['phone'] : '—', '' !== $c['conversion_key'] ? $c['conversion_key'] : __( 'esclusa', 'lu3g-conversion-tracker' ) ) ) . '</p>';
 
-			// Modifica (scrive nel widget, come la sezione "Tracciamento LU3G" di Elementor)
 			$s   = $f['ct'];
 			$sel = function ( $name, array $opts ) use ( $s ) {
 				$cur = $s[ $name ] ?? '';
@@ -289,93 +290,100 @@ final class LU3G_CT_Admin {
 				$fields[ $fl['id'] ] = $fl['label'] . ' (' . $fl['id'] . ', ' . $fl['type'] . ')';
 			}
 			$country_fields = array( '' => __( 'Nessuno', 'lu3g-conversion-tracker' ) ) + array_slice( $fields, 2, null, true );
-			$inh            = __( 'Eredita', 'lu3g-conversion-tracker' );
-			echo '<form class="ct-form ct-formedit" data-save="form" data-key="' . esc_attr( $key ) . '" autocomplete="off"><h4>' . esc_html__( 'Impostazioni di questo form', 'lu3g-conversion-tracker' ) . '</h4><div class="ct-grid ct-grid--3">';
-			echo '<label class="ct-field"><span>' . esc_html__( 'Tracking del form', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_tracking', array( '' => $inh, 'on' => __( 'Attivo', 'lu3g-conversion-tracker' ), 'off' => __( 'Disattivo', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			self::field( 'lu3g_ct_event', __( 'Nome evento', 'lu3g-conversion-tracker' ), $s['lu3g_ct_event'] ?? '', '', 'placeholder="' . esc_attr( $g['event'] ) . '"' );
+			$inh            = __( 'Come le impostazioni', 'lu3g-conversion-tracker' );
+			echo '<form class="ct-form ct-formedit" data-save="form" data-key="' . esc_attr( $key ) . '" autocomplete="off"><div class="ct-grid">';
+			echo '<label class="ct-field"><span>' . esc_html__( 'Traccia questo form', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_tracking', array( '' => $inh . ' (' . ( $g['forms_enabled'] ? __( 'sì', 'lu3g-conversion-tracker' ) : __( 'no', 'lu3g-conversion-tracker' ) ) . ')', 'on' => __( 'Sì', 'lu3g-conversion-tracker' ), 'off' => __( 'No', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			self::field( 'lu3g_ct_event', __( 'Nome evento', 'lu3g-conversion-tracker' ), $s['lu3g_ct_event'] ?? '', __( 'Vuoto: quello delle impostazioni. Es. newsletter_signup.', 'lu3g-conversion-tracker' ), 'placeholder="' . esc_attr( $g['event'] ) . '"' );
+			echo '</div><details class="ct-advanced ct-advanced--inline"><summary>' . esc_html__( 'Avanzate', 'lu3g-conversion-tracker' ) . '</summary><div class="ct-grid ct-grid--3">';
 			self::field( 'lu3g_ct_label', __( 'Nome descrittivo', 'lu3g-conversion-tracker' ), $s['lu3g_ct_label'] ?? '', '', 'placeholder="' . esc_attr( LU3G_CT_Settings::label( $f['name'] ) ) . '"' );
+			echo '<label class="ct-field"><span>' . esc_html__( 'Campo email', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_email_field', $fields ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<label class="ct-field"><span>' . esc_html__( 'Campo telefono', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_phone_field', $fields ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<label class="ct-field"><span>' . esc_html__( 'Destinazione Ads', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_ads', array( '' => $inh, 'key' => __( 'Chiave specifica', 'lu3g-conversion-tracker' ), 'off' => __( 'Esclusa', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			self::field( 'lu3g_ct_conversion_key', __( 'Chiave della conversione', 'lu3g-conversion-tracker' ), $s['lu3g_ct_conversion_key'] ?? '', '', 'placeholder="lead"' );
+			echo '<label class="ct-field"><span>' . esc_html__( 'Conversioni avanzate', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_ec', array( '' => $inh, 'on' => __( 'Sì (col consenso)', 'lu3g-conversion-tracker' ), 'off' => __( 'No', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<label class="ct-field"><span>' . esc_html__( 'Valore', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_value_mode', array( '' => $inh, 'fixed' => __( 'Importo specifico', 'lu3g-conversion-tracker' ), 'none' => __( 'Nessun valore', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			self::field( 'lu3g_ct_value', __( 'Importo', 'lu3g-conversion-tracker' ), $s['lu3g_ct_value'] ?? '', '', 'placeholder="25,50"' );
 			self::field( 'lu3g_ct_currency', __( 'Valuta', 'lu3g-conversion-tracker' ), $s['lu3g_ct_currency'] ?? '', '', 'placeholder="' . esc_attr( $g['currency'] ) . '"' );
-			echo '<label class="ct-field"><span>' . esc_html__( 'Campo email', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_email_field', $fields ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<label class="ct-field"><span>' . esc_html__( 'Campo telefono', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_phone_field', $fields ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<label class="ct-field"><span>' . esc_html__( 'Campo paese', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_country_field', $country_fields ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			self::field( 'lu3g_ct_country', __( 'Paese del telefono', 'lu3g-conversion-tracker' ), $s['lu3g_ct_country'] ?? '', '', 'placeholder="' . esc_attr( $g['country'] ) . '" maxlength="2"' );
-			echo '<label class="ct-field"><span>' . esc_html__( 'Conversioni avanzate', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_ec', array( '' => $inh, 'on' => __( 'Abilitate (col consenso)', 'lu3g-conversion-tracker' ), 'off' => __( 'Disabilitate', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<label class="ct-field"><span>' . esc_html__( 'Destinazione Ads', 'lu3g-conversion-tracker' ) . '</span>' . $sel( 'lu3g_ct_ads', array( '' => $inh, 'key' => __( 'Chiave specifica', 'lu3g-conversion-tracker' ), 'off' => __( 'Esclusa', 'lu3g-conversion-tracker' ) ) ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			self::field( 'lu3g_ct_conversion_key', __( 'Chiave della conversione', 'lu3g-conversion-tracker' ), $s['lu3g_ct_conversion_key'] ?? '', '', 'placeholder="lead"' );
-			echo '</div><div class="ct-inline"><button type="submit" class="ct-btn ct-btn--primary">' . esc_html__( 'Salva in Elementor', 'lu3g-conversion-tracker' ) . '</button><a class="ct-link" href="' . esc_url( LU3G_CT_Forms::edit_url( $f['post_id'] ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Apri in Elementor', 'lu3g-conversion-tracker' ) . ' ↗</a></div>';
-			echo '<p class="ct-help">' . esc_html__( 'Il salvataggio scrive nelle impostazioni del widget (le stesse della sezione "Tracciamento LU3G" in Elementor). Se cambi nome evento o chiave, aggiorna anche GTM.', 'lu3g-conversion-tracker' ) . '</p></form>';
+			echo '</div></details><div class="ct-inline"><button type="submit" class="ct-btn ct-btn--primary">' . esc_html__( 'Salva in Elementor', 'lu3g-conversion-tracker' ) . '</button><a class="ct-link" href="' . esc_url( LU3G_CT_Forms::edit_url( $f['post_id'] ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Apri in Elementor', 'lu3g-conversion-tracker' ) . ' ↗</a></div></form>';
 			echo '</div></details>';
 		}
 		echo '</div></div>';
 	}
 
 	private static function tab_contacts( array $g ) {
-		echo '<form class="ct-form" data-save="settings" autocomplete="off">';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Click sui contatti', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Link tel:, mailto: e WhatsApp click-to-chat (wa.me, api.whatsapp.com/send, web.whatsapp.com/send, whatsapp://send) in tutto il sito, anche fuori da Elementor. Misura l\'intenzione di contatto, non una chiamata fatta o un messaggio inviato.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
-		self::toggle( 'contacts', __( 'Traccia i click sui contatti', 'lu3g-conversion-tracker' ), $g['contacts'] );
-		self::field( 'contact_event', __( 'Nome evento', 'lu3g-conversion-tracker' ), $g['contact_event'] );
-		echo '</div></div>';
-		$ch = array(
-			'whatsapp' => 'WhatsApp',
-			'phone'    => __( 'Telefono (tel:)', 'lu3g-conversion-tracker' ),
-			'email'    => __( 'Email (mailto:)', 'lu3g-conversion-tracker' ),
+		$types = array(
+			'url'      => __( 'Indirizzo del link', 'lu3g-conversion-tracker' ),
+			'ext'      => __( 'Tipo di file', 'lu3g-conversion-tracker' ),
+			'selector' => __( 'Classe CSS del pulsante', 'lu3g-conversion-tracker' ),
 		);
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Canali', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Ogni canale ha la sua chiave di conversione Ads (vuota = escluso da Ads) e il suo valore, separati dai form.', 'lu3g-conversion-tracker' ) . '</p>';
-		foreach ( $ch as $k => $label ) {
-			echo '<div class="ct-grid ct-grid--3 ct-channel">';
-			self::toggle( 'ch_' . $k, $label, $g[ 'ch_' . $k ] );
-			self::field( 'key_' . $k, __( 'Chiave conversione Ads', 'lu3g-conversion-tracker' ), $g[ 'key_' . $k ] );
-			self::field( 'value_' . $k, __( 'Valore', 'lu3g-conversion-tracker' ), $g[ 'value_' . $k ], __( 'Vuoto: nessun valore.', 'lu3g-conversion-tracker' ) );
+		echo '<form class="ct-form" data-save="settings" autocomplete="off">';
+		echo '<div class="ct-card"><h3>' . esc_html__( 'Click sui canali di contatto', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Un evento a ogni click, in tutto il sito (anche fuori da Elementor). Misura l\'intenzione di contatto, non una chiamata fatta o un messaggio inviato.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
+		self::toggle( 'contacts', __( 'Traccia i click sui canali', 'lu3g-conversion-tracker' ), $g['contacts'] );
+		self::field( 'contact_event', __( 'Nome evento', 'lu3g-conversion-tracker' ), $g['contact_event'], __( 'Il canale arriva in contact_type (whatsapp, phone, email, maps…).', 'lu3g-conversion-tracker' ) );
+		echo '</div></div>';
+
+		echo '<div class="ct-card"><h3>' . esc_html__( 'Canali', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Accendi quelli che ti servono. La chiave Ads collega il canale a una conversione di Google Ads (vuota = solo Analytics).', 'lu3g-conversion-tracker' ) . '</p>';
+		echo '<div class="ct-chlist">';
+		$builtin = array(
+			'whatsapp' => array( 'WhatsApp', 'wa.me, api.whatsapp.com/send, web.whatsapp.com/send, whatsapp://' ),
+			'phone'    => array( __( 'Telefono', 'lu3g-conversion-tracker' ), 'tel:' ),
+			'email'    => array( __( 'Email', 'lu3g-conversion-tracker' ), 'mailto:' ),
+		);
+		foreach ( $builtin as $k => $b ) {
+			echo '<div class="ct-ch">';
+			self::toggle( 'ch_' . $k, $b[0], $g[ 'ch_' . $k ], $b[1] );
+			self::field( 'key_' . $k, __( 'Chiave Ads', 'lu3g-conversion-tracker' ), $g[ 'key_' . $k ] );
 			echo '</div>';
 		}
-		echo '</div><div class="ct-card"><h3>' . esc_html__( 'Esclusioni e attributi', 'lu3g-conversion-tracker' ) . '</h3>';
-		echo '<label class="ct-field ct-field--wide"><span>' . esc_html__( 'Escludi questi elementi (selettori CSS, uno per riga)', 'lu3g-conversion-tracker' ) . '</span><textarea class="ct-input" name="contact_exclude" rows="3" spellcheck="false" placeholder=".footer-credits&#10;#menu-legale">' . esc_textarea( $g['contact_exclude'] ) . '</textarea></label>';
-		echo '<p class="ct-help">' . esc_html__( 'Facoltativi sul link o su un suo contenitore: data-lu3g-contact-id="commerciale" (contact_id), data-lu3g-placement="header" (placement; senza, si riconosce header/footer/popup di Elementor), data-lu3g-ct-ignore (non tracciare). I link funzionano anche senza attributi. Non si inviano numero, indirizzo, testo del messaggio né URL completo.', 'lu3g-conversion-tracker' ) . '</p></div>';
+		foreach ( $g['channels'] as $i => $c ) {
+			self::channel_row( $i, $c, $types );
+		}
+		echo '</div><template data-ch-template>';
+		self::channel_row( '__i__', array( 'id' => '', 'label' => '', 'type' => 'url', 'pattern' => '', 'on' => true, 'key' => '', 'value' => '' ), $types );
+		echo '</template><div class="ct-inline"><button type="button" class="ct-btn" data-ch-add>+ ' . esc_html__( 'Aggiungi un canale', 'lu3g-conversion-tracker' ) . '</button></div>';
+		echo '<p class="ct-help">' . esc_html__( 'Esempi di regole: indirizzo "calendly.com" (prenotazioni), "t.me, tg:" (Telegram), "google.com/maps" (indicazioni); tipo di file "pdf, zip"; classe CSS ".btn-prenota" per un pulsante qualsiasi.', 'lu3g-conversion-tracker' ) . '</p></div>';
+
+		echo '<details class="ct-card ct-advanced"><summary><h3>' . esc_html__( 'Avanzate', 'lu3g-conversion-tracker' ) . '</h3><span class="ct-help">' . esc_html__( 'Valori, esclusioni e attributi.', 'lu3g-conversion-tracker' ) . '</span></summary><div class="ct-grid ct-grid--3">';
+		self::field( 'value_whatsapp', __( 'Valore WhatsApp', 'lu3g-conversion-tracker' ), $g['value_whatsapp'], __( 'Vuoto: nessun valore.', 'lu3g-conversion-tracker' ) );
+		self::field( 'value_phone', __( 'Valore telefono', 'lu3g-conversion-tracker' ), $g['value_phone'] );
+		self::field( 'value_email', __( 'Valore email', 'lu3g-conversion-tracker' ), $g['value_email'] );
+		echo '</div><label class="ct-field ct-field--wide"><span>' . esc_html__( 'Escludi questi elementi (selettori CSS, uno per riga)', 'lu3g-conversion-tracker' ) . '</span><textarea class="ct-input" name="contact_exclude" rows="3" spellcheck="false" placeholder=".footer-credits&#10;#menu-legale">' . esc_textarea( $g['contact_exclude'] ) . '</textarea></label>';
+		echo '<p class="ct-help">' . esc_html__( 'Facoltativi sul link: data-lu3g-contact-id="commerciale", data-lu3g-placement="header", data-lu3g-ct-ignore (non tracciare). Non si inviano numero, indirizzo, testo del messaggio né URL completo.', 'lu3g-conversion-tracker' ) . '</p></details>';
 		self::savebar();
 		echo '</form>';
 	}
 
-	private static function tab_consent( array $g ) {
-		$opts = array(
-			'consent_mode' => array( __( 'Consent Mode v2 (qualsiasi CMP)', 'lu3g-conversion-tracker' ), __( 'Legge lo stato scritto dal tag "LU3G - Ponte consenso" di GTM dopo un evento del CMP (per i CMP che lavorano dentro GTM, come il modello Iubenda), oppure i comandi gtag(\'consent\', \'update\', …) che il CMP mette nel dataLayer. Il solo stato predefinito vale come sconosciuto.', 'lu3g-conversion-tracker' ) ),
-			'iubenda'      => array( 'Iubenda', __( 'Come sopra, più la presenza della Cookie Solution (_iub.cs.api). Con il modello Iubenda in GTM (googleConsentMode "template") lo stato arriva dal tag "LU3G - Ponte consenso" sugli eventi iubenda_*. L\'API JavaScript di Iubenda non espone lo stato per finalità, quindi si leggono i segnali che Iubenda passa a Google.', 'lu3g-conversion-tracker' ) ),
-			'custom'       => array( __( 'Adapter personalizzato', 'lu3g-conversion-tracker' ), __( 'Per altri CMP: una funzione window.lu3gCTConsent che restituisce lo stato esplicito (vedi sotto).', 'lu3g-conversion-tracker' ) ),
-			'none'         => array( __( 'Nessuno', 'lu3g-conversion-tracker' ), __( 'Senza CMP non c\'è consenso: gli identificatori non vengono mai inviati. Gli eventi sì.', 'lu3g-conversion-tracker' ) ),
-		);
-		echo '<form class="ct-form" data-save="settings" autocomplete="off"><div class="ct-card"><h3>' . esc_html__( 'Da dove leggere il consenso', 'lu3g-conversion-tracker' ) . '</h3>';
-		echo '<p class="ct-help">' . esc_html__( 'Il plugin distingue analytics_storage, ad_storage, ad_user_data e ad_personalization. Gli identificatori cifrati per Ads partono solo con ad_user_data esplicitamente "granted", controllato all\'invio e di nuovo subito prima del push. Il plugin non concede consensi, non mostra banner e non tocca le callback del CMP. Gli eventi senza identificatori partono sempre: è GTM, con Consent Mode, a decidere cosa fanno i tag.', 'lu3g-conversion-tracker' ) . '</p>';
-		foreach ( $opts as $v => $o ) {
-			printf( '<label class="ct-option"><input type="radio" name="consent" value="%1$s" %2$s><span><strong>%3$s</strong><small>%4$s</small></span></label>', esc_attr( $v ), checked( $g['consent'], $v, false ), esc_html( $o[0] ), esc_html( $o[1] ) );
+	/** Una riga di canale personalizzato (anche il modello per "Aggiungi"). */
+	private static function channel_row( $i, array $c, array $types ) {
+		$n = 'channels[' . $i . ']';
+		echo '<div class="ct-ch ct-ch--custom" data-ch-row>';
+		printf( '<label class="ct-toggle"><input type="checkbox" name="%1$s[on]" value="1" %2$s><span class="ct-toggle__ui" aria-hidden="true"></span><span><strong>%3$s</strong></span></label>', esc_attr( $n ), checked( ! empty( $c['on'] ), true, false ), esc_html__( 'Attivo', 'lu3g-conversion-tracker' ) );
+		echo '<input type="hidden" name="' . esc_attr( $n ) . '[id]" value="' . esc_attr( $c['id'] ) . '">';
+		self::field( $n . '[label]', __( 'Nome', 'lu3g-conversion-tracker' ), $c['label'], '', 'placeholder="' . esc_attr__( 'es. Prenotazioni', 'lu3g-conversion-tracker' ) . '"' );
+		echo '<label class="ct-field"><span>' . esc_html__( 'Riconosci dal', 'lu3g-conversion-tracker' ) . '</span><select name="' . esc_attr( $n ) . '[type]">';
+		foreach ( $types as $v => $l ) {
+			echo '<option value="' . esc_attr( $v ) . '"' . selected( $c['type'], $v, false ) . '>' . esc_html( $l ) . '</option>';
 		}
-		echo '<div class="ct-grid" style="margin-top:12px">';
-		self::field( 'consent_events', __( 'Eventi del CMP in GTM (regex)', 'lu3g-conversion-tracker' ), $g['consent_events'], __( 'Attivatore del tag "LU3G - Ponte consenso" nel JSON. Iubenda: ^iubenda_. Dopo una modifica riscarica il JSON.', 'lu3g-conversion-tracker' ) );
-		echo '</div></div>';
-		self::savebar();
-		echo '</form>';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Adapter personalizzato', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Da mettere nel sito (es. snippet WPCode) e adattare al CMP. ready deve essere true solo quando il CMP ha caricato la scelta dell\'utente.', 'lu3g-conversion-tracker' ) . '</p>';
-		echo '<pre class="ct-code">window.lu3gCTConsent = function () {
-  // Esempio: leggi lo stato dal tuo CMP.
-  var s = window.MioCMP &amp;&amp; window.MioCMP.getConsent ? window.MioCMP.getConsent() : null;
-  if (!s) { return { ready: false }; }
-  return {
-    ready: true,
-    analytics_storage: s.statistiche ? \'granted\' : \'denied\',
-    ad_storage: s.marketing ? \'granted\' : \'denied\',
-    ad_user_data: s.marketing ? \'granted\' : \'denied\',
-    ad_personalization: s.marketing ? \'granted\' : \'denied\'
-  };
-};</pre></div>';
+		echo '</select></label>';
+		self::field( $n . '[pattern]', __( 'Regola', 'lu3g-conversion-tracker' ), $c['pattern'], '', 'placeholder="calendly.com"' );
+		self::field( $n . '[key]', __( 'Chiave Ads', 'lu3g-conversion-tracker' ), $c['key'] );
+		self::field( $n . '[value]', __( 'Valore', 'lu3g-conversion-tracker' ), $c['value'] );
+		echo '<button type="button" class="ct-linkbtn" data-ch-remove aria-label="' . esc_attr__( 'Togli il canale', 'lu3g-conversion-tracker' ) . '">' . esc_html__( 'Togli', 'lu3g-conversion-tracker' ) . '</button></div>';
 	}
 
 	private static function tab_gtm( array $g ) {
 		$keys    = LU3G_CT_GTM::conversion_keys();
 		$events  = LU3G_CT_GTM::form_events();
 		$missing = LU3G_CT_GTM::missing();
-		echo '<form class="ct-form" data-save="settings" autocomplete="off"><div class="ct-card"><h3>' . esc_html__( 'ID per il container da importare', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Servono solo per generare il JSON: il plugin non manda niente a Google. Salvare qui non aggiorna GTM: dopo ogni modifica a eventi, chiavi o etichette scarica di nuovo il JSON e importalo.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
+		echo '<form class="ct-form" data-save="settings" autocomplete="off"><div class="ct-card"><h3>' . esc_html__( 'ID per il file da importare in GTM', 'lu3g-conversion-tracker' ) . '</h3><p class="ct-help">' . esc_html__( 'Servono solo a preparare il file: il plugin non manda niente a Google o Meta. Dopo ogni modifica a eventi, canali o etichette scarica di nuovo il file e importalo.', 'lu3g-conversion-tracker' ) . '</p><div class="ct-grid">';
 		self::field( 'gtm_ga4_id', __( 'ID di misurazione GA4', 'lu3g-conversion-tracker' ), $g['gtm_ga4_id'], 'G-XXXXXXXXXX' );
 		self::field( 'gtm_ads_id', __( 'ID conversione Google Ads', 'lu3g-conversion-tracker' ), $g['gtm_ads_id'], __( 'Solo cifre (AW-123456789 → 123456789).', 'lu3g-conversion-tracker' ) );
+		self::field( 'meta_pixel_id', __( 'ID pixel Meta', 'lu3g-conversion-tracker' ), $g['meta_pixel_id'], __( 'Facoltativo. Con l\'ID il file contiene anche i tag Meta (Lead, Contact) con il consenso.', 'lu3g-conversion-tracker' ) );
+		echo '<span></span>';
+		self::toggle( 'meta_base', __( 'Includi il pixel base Meta', 'lu3g-conversion-tracker' ), $g['meta_base'], __( 'Con il consenso marketing. Se lo includi, metti in pausa il tuo vecchio "Meta - Base Tag".', 'lu3g-conversion-tracker' ) );
+		self::toggle( 'has_linker', __( 'Il container ha già il Linker conversioni', 'lu3g-conversion-tracker' ), $g['has_linker'], __( 'Così il file non ne aggiunge un secondo.', 'lu3g-conversion-tracker' ) );
 		echo '</div><h4>' . esc_html__( 'Etichette delle conversioni Ads, per chiave', 'lu3g-conversion-tracker' ) . '</h4><div class="ct-grid">';
 		foreach ( $keys as $k ) {
 			self::field( 'gtm_labels[' . $k . ']', $k, $g['gtm_labels'][ $k ] ?? '', __( 'Etichetta (Conversion Label). Vuota: questa chiave non va ad Ads.', 'lu3g-conversion-tracker' ) );
@@ -386,38 +394,33 @@ final class LU3G_CT_Admin {
 
 		echo '<div class="ct-card"><h3>' . esc_html__( 'Scarica e importa', 'lu3g-conversion-tracker' ) . '</h3>';
 		if ( $missing ) {
-			echo '<p class="ct-warn">' . esc_html__( 'Mancano ancora: ', 'lu3g-conversion-tracker' ) . esc_html( implode( '; ', $missing ) ) . '. ' . esc_html__( 'Nel JSON restano come SOSTITUISCI.', 'lu3g-conversion-tracker' ) . '</p>';
+			echo '<p class="ct-warn">' . esc_html__( 'Mancano ancora: ', 'lu3g-conversion-tracker' ) . esc_html( implode( '; ', $missing ) ) . '. ' . esc_html__( 'Nel file restano come SOSTITUISCI.', 'lu3g-conversion-tracker' ) . '</p>';
 		}
-		/* translators: %s: elenco eventi */
-		echo '<p class="ct-help">' . esc_html( sprintf( __( 'Eventi dei form inclusi: %s; più %s.', 'lu3g-conversion-tracker' ), implode( ', ', $events ), $g['contact_event'] ) ) . '</p>';
-		echo '<div class="ct-inline"><a class="ct-btn ct-btn--primary" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica il container (JSON)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del bridge (.tpl)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl_consent' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del ponte consenso (.tpl)', 'lu3g-conversion-tracker' ) . '</a></div>';
+		/* translators: 1: eventi form, 2: evento contatti */
+		echo '<p class="ct-help">' . esc_html( sprintf( __( 'Eventi inclusi: %1$s; %2$s.', 'lu3g-conversion-tracker' ), implode( ', ', $events ), $g['contact_event'] ) ) . '</p>';
+		echo '<div class="ct-inline"><a class="ct-btn ct-btn--primary" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_gtm' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Scarica il file per GTM (JSON)', 'lu3g-conversion-tracker' ) . '</a></div>';
 		echo '<ol class="ct-steps">';
 		$steps = array(
-			__( 'GTM → Amministrazione → Importa container → scegli il file → area di lavoro nuova (consigliato) → opzione "Unisci" → "Rinomina i tag, gli attivatori e le variabili in conflitto". Tutti gli elementi iniziano con "LU3G -".', 'lu3g-conversion-tracker' ),
-			__( 'Controlla le variabili "LU3G - GA4 Measurement ID", "LU3G - Ads Conversion ID" e la tabella "LU3G - Ads Conversion Label" (chiave → etichetta).', 'lu3g-conversion-tracker' ),
-			__( 'Se il container ha già un Linker conversioni, elimina "LU3G - Linker conversioni". Se ha già un tag che ascolta gli invii dei form (es. Invio modulo automatico di GA4 o uno script personale), toglilo o escludi questi eventi: altrimenti i lead contano due volte.', 'lu3g-conversion-tracker' ),
-			__( 'Non usare come principali nello stesso account Ads sia questa conversione diretta sia la stessa conversione importata da GA4: una delle due va come secondaria.', 'lu3g-conversion-tracker' ),
-			__( 'In Google Ads: Obiettivi → Impostazioni → "Uso dei dati dei clienti" → attiva le conversioni avanzate (dal 2026 interruttore unico per web e lead). Nel Google tag: "Consenti le funzionalità dei dati forniti dagli utenti".', 'lu3g-conversion-tracker' ),
-			__( 'Anteprima (Tag Assistant) → nel sito avvia una sessione di verifica (Diagnostica) → invia un form: in Tag Assistant compare lead_submit con test_mode true e i tag LU3G di produzione NON partono (corretto). Per provare i tag reali usa un form di prova con la modalità di test spenta e filtra il traffico in GA4.', 'lu3g-conversion-tracker' ),
-			__( 'Pubblica il container solo dopo la verifica. Il plugin non pubblica niente da solo.', 'lu3g-conversion-tracker' ),
+			__( 'tagmanager.google.com → il container del sito → Amministrazione → Importa container → scegli il file → area di lavoro Nuova → Unisci → "Rinomina i tag, gli attivatori e le variabili in conflitto".', 'lu3g-conversion-tracker' ),
+			__( 'Metti in pausa i vecchi tag che partivano sugli stessi eventi (lead_submit, contact_click): conversioni GA4, Google Ads e Meta create prima del plugin. I nuovi iniziano con "LU3G -". Tieni i Google tag base (GA4, Ads) e il banner dei cookie.', 'lu3g-conversion-tracker' ),
+			__( 'Anteprima: invia un form e clicca un contatto. Da amministratore gli eventi sono di test e i tag LU3G di produzione non partono (corretto); in incognito partono.', 'lu3g-conversion-tracker' ),
+			__( 'Invia → Pubblica. In Google Ads: Obiettivi → Impostazioni → "Uso dei dati dei clienti" → attiva le conversioni avanzate.', 'lu3g-conversion-tracker' ),
 		);
 		foreach ( $steps as $s ) {
 			echo '<li>' . esc_html( $s ) . '</li>';
 		}
-		echo '</ol></div>';
-		echo '<div class="ct-card"><h3>' . esc_html__( 'Cosa contiene', 'lu3g-conversion-tracker' ) . '</h3><ul class="ct-list">';
+		echo '</ol>';
+		echo '<details class="ct-advanced ct-advanced--inline"><summary>' . esc_html__( 'Cosa contiene il file e modelli separati', 'lu3g-conversion-tracker' ) . '</summary><ul class="ct-list">';
 		$items = array(
-			__( 'Variabili del dataLayer per lu3g.* (event_id, form_name, value, currency, conversion_key, test_mode, contact_type…).', 'lu3g-conversion-tracker' ),
-			__( '"LU3G - user_data (hash)": JavaScript che restituisce solo sha256_email_address / sha256_phone_number validi, già calcolati (nessuna Promise); "LU3G - Dati forniti dall\'utente" in modalità Codice la usa.', 'lu3g-conversion-tracker' ),
-			__( 'GA4: un tag per gli eventi dei form e uno per i click, solo metadati ordinari (nessun dato utente), page_location senza query string. Il nome evento resta lead_submit: mapparlo su generate_lead va fatto apposta, al posto di questo, non in aggiunta.', 'lu3g-conversion-tracker' ),
-			__( 'Google Ads: un tag conversione per le chiavi con etichetta, valore e valuta, ID transazione = event_id (deduplica delle conversioni Ads con lo stesso ID; non vale per GA4), conversioni avanzate con i soli dati di questo evento.', 'lu3g-conversion-tracker' ),
-			__( 'Attivatori di produzione con test_mode = false; un evento alternativo va ad Ads solo se ha una chiave con etichetta.', 'lu3g-conversion-tracker' ),
-			__( 'Bridge diagnostico (modello personalizzato con addEventCallback): restituisce al plugin event_id, container e stato dei tag GA4/Ads, senza dati personali.', 'lu3g-conversion-tracker' ),
+			__( 'GA4: un tag per i form e uno per i click, senza dati personali, page_location senza query string.', 'lu3g-conversion-tracker' ),
+			__( 'Google Ads: una conversione per ogni chiave con etichetta, ID transazione = event_id, conversioni avanzate con gli hash di quell\'evento.', 'lu3g-conversion-tracker' ),
+			__( 'Meta (se c\'è l\'ID): pixel base, Lead sui form e Contact sui click, con eventID = event_id, solo con il consenso marketing (ad_storage).', 'lu3g-conversion-tracker' ),
+			__( 'Ponte consenso (eventi del banner), bridge diagnostico, linker (se non c\'è già). Attivatori di produzione con test_mode = false.', 'lu3g-conversion-tracker' ),
 		);
 		foreach ( $items as $i ) {
 			echo '<li>' . esc_html( $i ) . '</li>';
 		}
-		echo '</ul></div>';
+		echo '</ul><div class="ct-inline"><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del bridge (.tpl)', 'lu3g-conversion-tracker' ) . '</a><a class="ct-btn" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=lu3g_ct_tpl_consent' ), 'lu3g_ct_dl' ) ) . '">' . esc_html__( 'Modello del ponte consenso (.tpl)', 'lu3g-conversion-tracker' ) . '</a></div></details></div>';
 	}
 
 	private static function tab_diag( array $g ) {

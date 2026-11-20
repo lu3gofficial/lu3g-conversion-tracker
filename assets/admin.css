@@ -154,3 +154,23 @@ textarea.ct-input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 	.ct-toast { animation: ct-in .3s var(--ease) both; }
 	@keyframes ct-in { from { opacity: 0; transform: translateY(8px); } }
 }
+
+/* -------------------------------------------------------------- 1.2.0: sezioni Avanzate e canali */
+
+.ct-advanced > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; cursor: pointer; list-style: none; }
+.ct-advanced > summary::-webkit-details-marker { display: none; }
+.ct-advanced > summary::before { content: "›"; color: var(--muted); font-size: 18px; line-height: 1; transition: transform .2s; }
+.ct-advanced[open] > summary::before { transform: rotate(90deg); }
+.ct-advanced > summary h3 { margin: 0; }
+.ct-advanced > summary .ct-help { margin: 0 !important; }
+.ct-advanced[open] > summary { margin-bottom: 8px; }
+.ct-advanced--inline { margin-top: 12px; }
+.ct-advanced--inline > summary { font-size: 13px; font-weight: 700; }
+.ct-chlist { display: grid; gap: 0; }
+.ct-ch { display: grid; grid-template-columns: minmax(200px, 1.2fr) 1fr; gap: 12px 18px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.ct-ch:first-child { border-top: 0; }
+.ct-ch--custom { grid-template-columns: 110px repeat(5, minmax(0, 1fr)) auto; align-items: end; }
+.ct-linkbtn { padding: 8px 4px; border: 0; background: none; color: var(--red); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.ct-linkbtn:hover, .ct-linkbtn:focus { text-decoration: underline; }
+@media (max-width: 1100px) { .ct-ch--custom { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .ct-ch { grid-template-columns: 1fr; } }

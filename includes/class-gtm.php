@@ -44,6 +44,9 @@ final class LU3G_CT_GTM {
 	public static function conversion_keys() {
 		$g    = LU3G_CT_Settings::get();
 		$keys = array( $g['conversion_key'], $g['key_whatsapp'], $g['key_phone'], $g['key_email'] );
+		foreach ( LU3G_CT_Settings::active_channels() as $c ) {
+			$keys[] = $c['key'];
+		}
 		foreach ( LU3G_CT_Forms::all() as $f ) {
 			$e      = LU3G_CT_Settings::effective( $f );
 			$keys[] = $e['cfg']['conversion_key'];
@@ -196,7 +199,7 @@ final class LU3G_CT_GTM {
 
 		// Tag
 		$tags = array();
-		$tag  = function ( $name, $type, array $params, array $fire, $role = '' ) use ( &$tags, $id ) {
+		$tag  = function ( $name, $type, array $params, array $fire, $role = '', array $extra = array() ) use ( &$tags, $id ) {
 			$t = array(
 				'accountId'        => self::ACCOUNT,
 				'containerId'      => self::CONTAINER,
@@ -215,7 +218,23 @@ final class LU3G_CT_GTM {
 				);
 				$t['monitoringMetadataTagNameKey'] = 'name';
 			}
-			$tags[] = $t;
+			$tags[] = array_merge( $t, $extra );
+		};
+		// Consenso richiesto per i tag che non gestiscono Consent Mode da soli (HTML personalizzato, es. Meta).
+		$needs_ads_consent = array(
+			'consentSettings' => array(
+				'consentStatus' => 'NEEDED',
+				'consentType'   => array(
+					'type' => 'LIST',
+					'list' => array( array( 'type' => 'TEMPLATE', 'value' => 'ad_storage' ) ),
+				),
+			),
+		);
+		$html = function ( $code ) {
+			return array(
+				array( 'type' => 'TEMPLATE', 'key' => 'html', 'value' => $code ),
+				array( 'type' => 'BOOLEAN', 'key' => 'supportDocumentWrite', 'value' => 'false' ),
+			);
 		};
 		$table = function ( array $pairs ) {
 			$list = array();
@@ -294,16 +313,50 @@ final class LU3G_CT_GTM {
 				'ads'
 			);
 		}
-		$tag(
-			'LU3G - Linker conversioni',
-			'gclidw',
-			array(
-				array( 'type' => 'BOOLEAN', 'key' => 'enableCrossDomain', 'value' => 'false' ),
-				array( 'type' => 'BOOLEAN', 'key' => 'enableUrlPassthrough', 'value' => 'false' ),
-				array( 'type' => 'BOOLEAN', 'key' => 'enableCookieOverrides', 'value' => 'false' ),
-			),
-			array( self::ALL_PAGES )
-		);
+		// Meta: solo se c'è l'ID del pixel. Partono solo con il consenso marketing (ad_storage).
+		if ( '' !== $g['meta_pixel_id'] ) {
+			$setup = array();
+			if ( $g['meta_base'] ) {
+				$tag(
+					'LU3G - Meta - Pixel base',
+					'html',
+					$html( "<script>\n!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');\nfbq('init', '" . $g['meta_pixel_id'] . "');\nfbq('track', 'PageView');\n</script>" ),
+					// Tutte le pagine + eventi del banner: se il consenso arriva dopo il caricamento, il pixel parte allora (una volta).
+					array( self::ALL_PAGES, $t_consent ),
+					'',
+					array_merge( $needs_ads_consent, array( 'tagFiringOption' => 'ONCE_PER_LOAD' ) )
+				);
+				$setup = array( 'setupTag' => array( array( 'tagName' => 'LU3G - Meta - Pixel base', 'stopOnSetupFailure' => false ) ) );
+			}
+			$tag(
+				'LU3G - Meta - Lead',
+				'html',
+				$html( "<script>\nif (window.fbq) { fbq('track', 'Lead', {}, { eventID: '{{LU3G - event_id}}' }); }\n</script>" ),
+				array( $t_forms ),
+				'meta',
+				array_merge( $needs_ads_consent, $setup )
+			);
+			$tag(
+				'LU3G - Meta - Contact',
+				'html',
+				$html( "<script>\nif (window.fbq) { fbq('track', 'Contact', { content_category: '{{LU3G - contact_type}}' }, { eventID: '{{LU3G - event_id}}' }); }\n</script>" ),
+				array( $t_contact ),
+				'meta',
+				array_merge( $needs_ads_consent, $setup )
+			);
+		}
+		if ( ! $g['has_linker'] ) {
+			$tag(
+				'LU3G - Linker conversioni',
+				'gclidw',
+				array(
+					array( 'type' => 'BOOLEAN', 'key' => 'enableCrossDomain', 'value' => 'false' ),
+					array( 'type' => 'BOOLEAN', 'key' => 'enableUrlPassthrough', 'value' => 'false' ),
+					array( 'type' => 'BOOLEAN', 'key' => 'enableCookieOverrides', 'value' => 'false' ),
+				),
+				array( self::ALL_PAGES )
+			);
+		}
 		$tag( 'LU3G - Bridge diagnostico', 'cvt_' . self::CONTAINER . '_1', array(), array( $t_bridge ) );
 		// Ponte del consenso: scrive nella pagina lo stato dei 4 segnali dopo ogni evento del CMP (es. modello Iubenda).
 		$tag( 'LU3G - Ponte consenso', 'cvt_' . self::CONTAINER . '_2', array(), array( $t_consent ) );
